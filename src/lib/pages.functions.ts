@@ -118,7 +118,7 @@ export const savePage = createServerFn({ method: "POST" })
 
     const nextVersion = (current.current_version ?? 1) + 1;
 
-    const update: Record<string, unknown> = {
+    const update: { content: any; current_version: number; name?: string } = {
       content: data.content as unknown as any,
       current_version: nextVersion,
     };
