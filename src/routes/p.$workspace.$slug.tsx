@@ -53,7 +53,7 @@ function PublicPage() {
         trackEvent({ data: { pageId: page.id, eventType: "click", sessionId: sid, properties: { href: a.getAttribute("href") } } }).catch(() => {});
       }
     }}>
-      <RenderPage content={page.content as PageContent} />
+      <RenderPage content={page.content as unknown as PageContent} />
     </div>
   );
 }
