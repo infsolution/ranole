@@ -42,7 +42,7 @@ function Editor() {
   useEffect(() => {
     if (page) {
       setName(page.name);
-      setContent((page.content as PageContent) || { sections: [] });
+      setContent((page.content as unknown as PageContent) || { sections: [] });
       history.current = [];
       future.current = [];
       dirty.current = false;
