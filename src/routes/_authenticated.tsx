@@ -1,0 +1,49 @@
+import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import { LayoutDashboard, LogOut, Sparkles } from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated")({
+  beforeLoad: async ({ location }) => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) {
+      throw redirect({ to: "/login", search: { redirect: location.href } as never });
+    }
+    return { user: data.user };
+  },
+  component: Layout,
+});
+
+function Layout() {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  async function logout() {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-6">
+            <Link to="/dashboard" className="flex items-center gap-2 font-display font-semibold">
+              <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-primary text-primary-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
+              Indigo
+            </Link>
+            <nav className="flex items-center gap-1 text-sm">
+              <Link to="/dashboard"
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/dashboard") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                <LayoutDashboard className="h-4 w-4" /> Páginas
+              </Link>
+            </nav>
+          </div>
+          <button onClick={logout} className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
+            <LogOut className="h-4 w-4" /> Sair
+          </button>
+        </div>
+      </header>
+      <Outlet />
+    </div>
+  );
+}
