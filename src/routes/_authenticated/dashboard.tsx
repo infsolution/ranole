@@ -110,7 +110,10 @@ function Dashboard() {
                         <ExternalLink className="h-3.5 w-3.5" /> Abrir
                       </a>
                     )}
-                    <button onClick={() => mDup.mutate(p.id)} className="ml-auto rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Duplicar">
+                    <Link to="/analytics/$id" params={{ id: p.id }} className="ml-auto rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Analytics">
+                      <BarChart3 className="h-3.5 w-3.5" />
+                    </Link>
+                    <button onClick={() => mDup.mutate(p.id)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Duplicar">
                       <Copy className="h-3.5 w-3.5" />
                     </button>
                     <button onClick={() => { if (confirm("Excluir esta página?")) mDel.mutate(p.id); }} className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/20 hover:text-destructive" title="Excluir">
