@@ -253,3 +253,70 @@ export const getPageStats = createServerFn({ method: "GET" })
     const clicks = rows?.filter((r) => r.event_type === "click").length ?? 0;
     return { total, views, clicks };
   });
+
+export const getPageAnalytics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({
+      id: z.string().uuid(),
+      days: z.number().int().min(1).max(90).default(7),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const since = new Date(Date.now() - data.days * 24 * 60 * 60 * 1000);
+
+    const { data: page, error: pErr } = await supabase
+      .from("pages").select("id, name, slug, status").eq("id", data.id).single();
+    if (pErr) throw new Error(pErr.message);
+
+    const { data: rows, error } = await supabase
+      .from("analytics_events")
+      .select("event_type, session_id, properties, created_at")
+      .eq("page_id", data.id)
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+
+    const events = rows ?? [];
+    const views = events.filter((e) => e.event_type === "pageview").length;
+    const clicks = events.filter((e) => e.event_type === "click").length;
+    const sessions = new Set(events.map((e) => e.session_id).filter(Boolean)).size;
+    const ctr = views > 0 ? clicks / views : 0;
+
+    // Series per day
+    const dayKey = (iso: string) => iso.slice(0, 10);
+    const buckets = new Map<string, { date: string; views: number; clicks: number }>();
+    for (let i = data.days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const k = d.toISOString().slice(0, 10);
+      buckets.set(k, { date: k, views: 0, clicks: 0 });
+    }
+    for (const e of events) {
+      const k = dayKey(e.created_at as unknown as string);
+      const b = buckets.get(k);
+      if (!b) continue;
+      if (e.event_type === "pageview") b.views++;
+      else if (e.event_type === "click") b.clicks++;
+    }
+
+    // Top clicked links
+    const clickMap = new Map<string, number>();
+    for (const e of events) {
+      if (e.event_type !== "click") continue;
+      const href = (e.properties as any)?.href as string | undefined;
+      if (!href) continue;
+      clickMap.set(href, (clickMap.get(href) ?? 0) + 1);
+    }
+    const topLinks = [...clickMap.entries()]
+      .map(([href, count]) => ({ href, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+
+    return {
+      page,
+      totals: { views, clicks, sessions, ctr },
+      series: [...buckets.values()],
+      topLinks,
+    };
+  });

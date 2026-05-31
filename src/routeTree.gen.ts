@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as PWorkspaceSlugRouteImport } from './routes/p.$workspace.$slug'
 import { Route as AuthenticatedEditorIdRouteImport } from './routes/_authenticated/editor.$id'
+import { Route as AuthenticatedAnalyticsIdRouteImport } from './routes/_authenticated/analytics.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -45,11 +46,18 @@ const AuthenticatedEditorIdRoute = AuthenticatedEditorIdRouteImport.update({
   path: '/editor/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAnalyticsIdRoute =
+  AuthenticatedAnalyticsIdRouteImport.update({
+    id: '/analytics/$id',
+    path: '/analytics/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
@@ -57,6 +65,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
@@ -66,6 +75,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/_authenticated/editor/$id': typeof AuthenticatedEditorIdRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
@@ -75,16 +85,24 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/analytics/$id'
     | '/editor/$id'
     | '/p/$workspace/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/editor/$id' | '/p/$workspace/$slug'
+  to:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/analytics/$id'
+    | '/editor/$id'
+    | '/p/$workspace/$slug'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/dashboard'
+    | '/_authenticated/analytics/$id'
     | '/_authenticated/editor/$id'
     | '/p/$workspace/$slug'
   fileRoutesById: FileRoutesById
@@ -140,16 +158,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEditorIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/analytics/$id': {
+      id: '/_authenticated/analytics/$id'
+      path: '/analytics/$id'
+      fullPath: '/analytics/$id'
+      preLoaderRoute: typeof AuthenticatedAnalyticsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedAnalyticsIdRoute: typeof AuthenticatedAnalyticsIdRoute
   AuthenticatedEditorIdRoute: typeof AuthenticatedEditorIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedAnalyticsIdRoute: AuthenticatedAnalyticsIdRoute,
   AuthenticatedEditorIdRoute: AuthenticatedEditorIdRoute,
 }
 
@@ -166,13 +193,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
