@@ -5,14 +5,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, GripVertical, Smartphone, Monitor, Tablet, Undo2, Redo2 } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, GripVertical, Smartphone, Monitor, Tablet, Undo2, Redo2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { getPage, publishPage, savePage } from "@/lib/pages.functions";
+import { generatePageFromPrompt } from "@/lib/ai.functions";
 import { blockList, blockRegistry } from "@/lib/blocks/registry";
 import { newId, type PageContent, type Section, type SectionType } from "@/lib/blocks/types";
 import { RenderPage } from "@/components/blocks/RenderPage";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/editor/$id")({
   head: () => ({ meta: [{ title: "Editor — Indigo" }] }),
