@@ -38,6 +38,9 @@ function Editor() {
   const [content, setContent] = useState<PageContent>({ sections: [] });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>("desktop");
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiMode, setAiMode] = useState<"replace" | "append">("replace");
   const history = useRef<PageContent[]>([]);
   const future = useRef<PageContent[]>([]);
   const dirty = useRef(false);
