@@ -30,6 +30,7 @@ function Editor() {
   const get = useServerFn(getPage);
   const save = useServerFn(savePage);
   const pub = useServerFn(publishPage);
+  const aiGen = useServerFn(generatePageFromPrompt);
 
   const { data: page, isLoading } = useQuery({ queryKey: ["page", id], queryFn: () => get({ data: { id } }) });
 
