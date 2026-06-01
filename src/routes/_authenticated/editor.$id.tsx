@@ -245,6 +245,47 @@ function Editor() {
           )}
         </aside>
       </div>
+
+      <Dialog open={aiOpen} onOpenChange={(o) => !mAi.isPending && setAiOpen(o)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" /> Gerar com IA
+            </DialogTitle>
+            <DialogDescription>
+              Descreva o produto, público e oferta. A IA monta uma página completa em segundos.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Textarea
+              rows={6}
+              placeholder="Ex.: Landing para curso online de finanças pessoais para iniciantes. Foco em transformação em 30 dias. Tom motivador e direto."
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              disabled={mAi.isPending}
+            />
+            <div className="flex gap-2 text-xs">
+              {([["replace", "Substituir página"], ["append", "Adicionar seções"]] as const).map(([m, label]) => (
+                <button key={m} type="button" onClick={() => setAiMode(m)}
+                  className={`rounded-md border px-3 py-1.5 ${aiMode === m ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground hover:text-foreground"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <button type="button" onClick={() => setAiOpen(false)} disabled={mAi.isPending}
+              className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm hover:bg-surface-elevated">
+              Cancelar
+            </button>
+            <button type="button" onClick={() => mAi.mutate()} disabled={mAi.isPending || aiPrompt.trim().length < 4}
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-glow disabled:opacity-60">
+              {mAi.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {mAi.isPending ? "Gerando..." : "Gerar página"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
