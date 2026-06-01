@@ -5,14 +5,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, GripVertical, Smartphone, Monitor, Tablet, Undo2, Redo2 } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, GripVertical, Smartphone, Monitor, Tablet, Undo2, Redo2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { getPage, publishPage, savePage } from "@/lib/pages.functions";
+import { generatePageFromPrompt } from "@/lib/ai.functions";
 import { blockList, blockRegistry } from "@/lib/blocks/registry";
 import { newId, type PageContent, type Section, type SectionType } from "@/lib/blocks/types";
 import { RenderPage } from "@/components/blocks/RenderPage";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/editor/$id")({
   head: () => ({ meta: [{ title: "Editor — Indigo" }] }),
@@ -28,6 +30,7 @@ function Editor() {
   const get = useServerFn(getPage);
   const save = useServerFn(savePage);
   const pub = useServerFn(publishPage);
+  const aiGen = useServerFn(generatePageFromPrompt);
 
   const { data: page, isLoading } = useQuery({ queryKey: ["page", id], queryFn: () => get({ data: { id } }) });
 
@@ -35,6 +38,9 @@ function Editor() {
   const [content, setContent] = useState<PageContent>({ sections: [] });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>("desktop");
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiMode, setAiMode] = useState<"replace" | "append">("replace");
   const history = useRef<PageContent[]>([]);
   const future = useRef<PageContent[]>([]);
   const dirty = useRef(false);
@@ -76,6 +82,20 @@ function Editor() {
   const mPub = useMutation({
     mutationFn: (publish: boolean) => pub({ data: { id, publish } }),
     onSuccess: (_, publish) => { toast.success(publish ? "Página publicada" : "Despublicada"); qc.invalidateQueries({ queryKey: ["page", id] }); qc.invalidateQueries({ queryKey: ["pages"] }); },
+  });
+  const mAi = useMutation({
+    mutationFn: () => aiGen({ data: { prompt: aiPrompt } }),
+    onSuccess: (res) => {
+      const generated = res.content as PageContent;
+      const next: PageContent = aiMode === "replace"
+        ? generated
+        : { sections: [...content.sections, ...generated.sections] };
+      update(next);
+      setAiOpen(false);
+      setAiPrompt("");
+      toast.success("Página gerada pela IA");
+    },
+    onError: (e: any) => toast.error(e.message),
   });
 
   // Autosave (debounced)
@@ -152,6 +172,10 @@ function Editor() {
           <button onClick={redo} disabled={!future.current.length} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground disabled:opacity-40">
             <Redo2 className="h-4 w-4" />
           </button>
+          <button onClick={() => setAiOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm text-primary hover:bg-primary/20">
+            <Sparkles className="h-3.5 w-3.5" /> IA
+          </button>
           <button onClick={() => mSave.mutate()} disabled={mSave.isPending}
             className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-1.5 text-sm hover:bg-surface">
             {mSave.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Salvar
@@ -221,6 +245,47 @@ function Editor() {
           )}
         </aside>
       </div>
+
+      <Dialog open={aiOpen} onOpenChange={(o) => !mAi.isPending && setAiOpen(o)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" /> Gerar com IA
+            </DialogTitle>
+            <DialogDescription>
+              Descreva o produto, público e oferta. A IA monta uma página completa em segundos.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Textarea
+              rows={6}
+              placeholder="Ex.: Landing para curso online de finanças pessoais para iniciantes. Foco em transformação em 30 dias. Tom motivador e direto."
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              disabled={mAi.isPending}
+            />
+            <div className="flex gap-2 text-xs">
+              {([["replace", "Substituir página"], ["append", "Adicionar seções"]] as const).map(([m, label]) => (
+                <button key={m} type="button" onClick={() => setAiMode(m)}
+                  className={`rounded-md border px-3 py-1.5 ${aiMode === m ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground hover:text-foreground"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <button type="button" onClick={() => setAiOpen(false)} disabled={mAi.isPending}
+              className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm hover:bg-surface-elevated">
+              Cancelar
+            </button>
+            <button type="button" onClick={() => mAi.mutate()} disabled={mAi.isPending || aiPrompt.trim().length < 4}
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-glow disabled:opacity-60">
+              {mAi.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {mAi.isPending ? "Gerando..." : "Gerar página"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
