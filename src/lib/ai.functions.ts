@@ -88,7 +88,7 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({ prompt: z.string().min(4).max(2000) }).parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<{ content: any }> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("LOVABLE_API_KEY ausente");
 
