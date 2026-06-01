@@ -83,6 +83,20 @@ function Editor() {
     mutationFn: (publish: boolean) => pub({ data: { id, publish } }),
     onSuccess: (_, publish) => { toast.success(publish ? "Página publicada" : "Despublicada"); qc.invalidateQueries({ queryKey: ["page", id] }); qc.invalidateQueries({ queryKey: ["pages"] }); },
   });
+  const mAi = useMutation({
+    mutationFn: () => aiGen({ data: { prompt: aiPrompt } }),
+    onSuccess: (res) => {
+      const generated = res.content as PageContent;
+      const next: PageContent = aiMode === "replace"
+        ? generated
+        : { sections: [...content.sections, ...generated.sections] };
+      update(next);
+      setAiOpen(false);
+      setAiPrompt("");
+      toast.success("Página gerada pela IA");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
 
   // Autosave (debounced)
   useEffect(() => {
