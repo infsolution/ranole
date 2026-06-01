@@ -172,6 +172,10 @@ function Editor() {
           <button onClick={redo} disabled={!future.current.length} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground disabled:opacity-40">
             <Redo2 className="h-4 w-4" />
           </button>
+          <button onClick={() => setAiOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm text-primary hover:bg-primary/20">
+            <Sparkles className="h-3.5 w-3.5" /> IA
+          </button>
           <button onClick={() => mSave.mutate()} disabled={mSave.isPending}
             className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-1.5 text-sm hover:bg-surface">
             {mSave.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Salvar
