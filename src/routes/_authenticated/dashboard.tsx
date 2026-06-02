@@ -81,6 +81,24 @@ function Dashboard() {
         </form>
       </div>
 
+      <div className="mt-12">
+        <div className="mb-4 flex items-center gap-2">
+          <LayoutTemplate className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Começar com um template</h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {templates.map((t) => (
+            <button key={t.id} onClick={() => createFromTemplate(t.id, t.name)}
+              className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-surface p-5 text-left transition hover:border-primary/60 hover:bg-surface-elevated hover:shadow-glow">
+              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-glow">{t.category}</span>
+              <h3 className="font-semibold">{t.name}</h3>
+              <p className="text-xs text-muted-foreground">{t.description}</p>
+              <span className="mt-auto pt-3 text-xs text-primary opacity-0 transition group-hover:opacity-100">Usar template →</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="mt-10">
         {isLoading ? (
           <div className="grid place-items-center py-20 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>
