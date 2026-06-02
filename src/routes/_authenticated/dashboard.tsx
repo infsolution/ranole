@@ -51,6 +51,18 @@ function Dashboard() {
     } finally { setCreating(false); }
   }
 
+  async function createFromTemplate(templateId: string, defaultName: string) {
+    const n = prompt("Nome da nova página", defaultName);
+    if (!n || !n.trim()) return;
+    try {
+      const r = await create({ data: { name: n.trim(), templateId } });
+      toast.success("Página criada a partir do template");
+      navigate({ to: "/editor/$id", params: { id: r.id } });
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="flex items-end justify-between gap-6">
