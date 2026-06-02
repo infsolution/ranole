@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { blockRegistry } from "@/lib/blocks/registry";
 import { newId } from "@/lib/blocks/types";
 import type { PageContent, SectionType } from "@/lib/blocks/types";
+import { getTemplate } from "@/lib/templates";
 
 function starterContent(): PageContent {
   const order: SectionType[] = ["hero", "benefits", "testimonials", "faq", "cta", "footer"];
