@@ -40,13 +40,52 @@ const footerProps = z.object({
   copyright: z.string(),
   tagline: z.string().optional(),
 });
+const featuresProps = z.object({
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+  items: z.array(z.object({ title: z.string(), description: z.string() })).min(3).max(9),
+});
+const pricingProps = z.object({
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+  items: z.array(z.object({
+    name: z.string(),
+    price: z.string(),
+    period: z.string().optional(),
+    description: z.string().optional(),
+    features: z.string(),
+    ctaText: z.string().optional(),
+    ctaHref: z.string().optional(),
+    highlight: z.string().optional(),
+  })).min(2).max(4),
+});
+const logosProps = z.object({
+  title: z.string().optional(),
+  items: z.array(z.object({ name: z.string() })).min(3).max(8),
+});
+const statsProps = z.object({
+  title: z.string().optional(),
+  items: z.array(z.object({ value: z.string(), label: z.string() })).min(2).max(6),
+});
+const contactProps = z.object({
+  title: z.string(),
+  subtitle: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  ctaText: z.string().optional(),
+});
 
 const sectionSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("hero"), props: heroProps }),
   z.object({ type: z.literal("benefits"), props: benefitsProps }),
+  z.object({ type: z.literal("features"), props: featuresProps }),
+  z.object({ type: z.literal("pricing"), props: pricingProps }),
+  z.object({ type: z.literal("logos"), props: logosProps }),
+  z.object({ type: z.literal("stats"), props: statsProps }),
   z.object({ type: z.literal("cta"), props: ctaProps }),
   z.object({ type: z.literal("faq"), props: faqProps }),
   z.object({ type: z.literal("testimonials"), props: testimonialsProps }),
+  z.object({ type: z.literal("contact"), props: contactProps }),
   z.object({ type: z.literal("footer"), props: footerProps }),
 ]);
 

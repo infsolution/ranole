@@ -3,8 +3,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createPage, deletePage, duplicatePage, listMyPages, publishPage } from "@/lib/pages.functions";
+import { templates } from "@/lib/templates";
 import { Input } from "@/components/ui/input";
-import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3 } from "lucide-react";
+import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -50,6 +51,18 @@ function Dashboard() {
     } finally { setCreating(false); }
   }
 
+  async function createFromTemplate(templateId: string, defaultName: string) {
+    const n = prompt("Nome da nova página", defaultName);
+    if (!n || !n.trim()) return;
+    try {
+      const r = await create({ data: { name: n.trim(), templateId } });
+      toast.success("Página criada a partir do template");
+      navigate({ to: "/editor/$id", params: { id: r.id } });
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="flex items-end justify-between gap-6">
@@ -66,6 +79,24 @@ function Dashboard() {
             {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Criar
           </button>
         </form>
+      </div>
+
+      <div className="mt-12">
+        <div className="mb-4 flex items-center gap-2">
+          <LayoutTemplate className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Começar com um template</h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {templates.map((t) => (
+            <button key={t.id} onClick={() => createFromTemplate(t.id, t.name)}
+              className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-surface p-5 text-left transition hover:border-primary/60 hover:bg-surface-elevated hover:shadow-glow">
+              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-glow">{t.category}</span>
+              <h3 className="font-semibold">{t.name}</h3>
+              <p className="text-xs text-muted-foreground">{t.description}</p>
+              <span className="mt-auto pt-3 text-xs text-primary opacity-0 transition group-hover:opacity-100">Usar template →</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-10">

@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { blockRegistry } from "@/lib/blocks/registry";
 import { newId } from "@/lib/blocks/types";
 import type { PageContent, SectionType } from "@/lib/blocks/types";
+import { getTemplate } from "@/lib/templates";
 
 function starterContent(): PageContent {
   const order: SectionType[] = ["hero", "benefits", "testimonials", "faq", "cta", "footer"];
@@ -53,7 +54,12 @@ export const listMyPages = createServerFn({ method: "GET" })
 
 export const createPage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ name: z.string().min(1).max(80) }).parse(d))
+  .inputValidator((d) =>
+    z.object({
+      name: z.string().min(1).max(80),
+      templateId: z.string().min(1).max(40).optional(),
+    }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: ws } = await supabase
@@ -69,7 +75,8 @@ export const createPage = createServerFn({ method: "POST" })
       slug = `${baseSlug}-${i}`;
     }
 
-    const content = starterContent();
+    const tpl = data.templateId ? getTemplate(data.templateId) : undefined;
+    const content = tpl ? tpl.build() : starterContent();
     const { data: page, error } = await supabase
       .from("pages")
       .insert({

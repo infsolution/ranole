@@ -1,9 +1,14 @@
 export type SectionType =
   | "hero"
   | "benefits"
-  | "cta"
-  | "faq"
+  | "features"
+  | "pricing"
+  | "logos"
+  | "stats"
   | "testimonials"
+  | "faq"
+  | "contact"
+  | "cta"
   | "footer";
 
 export interface Section {
