@@ -90,11 +90,14 @@ function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {templates.map((t) => (
             <button key={t.id} onClick={() => createFromTemplate(t.id, t.name)}
-              className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-surface p-5 text-left transition hover:border-primary/60 hover:bg-surface-elevated hover:shadow-glow">
-              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-glow">{t.category}</span>
-              <h3 className="font-semibold">{t.name}</h3>
-              <p className="text-xs text-muted-foreground">{t.description}</p>
-              <span className="mt-auto pt-3 text-xs text-primary opacity-0 transition group-hover:opacity-100">Usar template →</span>
+              className="group flex flex-col gap-3 rounded-2xl border border-border bg-surface p-3 text-left transition hover:border-primary/60 hover:bg-surface-elevated hover:shadow-glow">
+              <TemplateThumbnail template={t} />
+              <div className="flex flex-col gap-1.5 px-1 pb-1">
+                <span className="w-fit rounded-full bg-primary/15 px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-glow">{t.category}</span>
+                <h3 className="font-semibold">{t.name}</h3>
+                <p className="text-xs text-muted-foreground">{t.description}</p>
+                <span className="mt-1 text-xs text-primary opacity-0 transition group-hover:opacity-100">Usar template →</span>
+              </div>
             </button>
           ))}
         </div>
