@@ -7,6 +7,7 @@ import { templates } from "@/lib/templates";
 import { Input } from "@/components/ui/input";
 import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate } from "lucide-react";
 import { toast } from "sonner";
+import { TemplateThumbnail } from "@/components/TemplateThumbnail";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Indigo" }] }),
