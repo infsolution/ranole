@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createPage, deletePage, duplicatePage, listMyPages, publishPage } from "@/lib/pages.functions";
 import { templates } from "@/lib/templates";
 import { Input } from "@/components/ui/input";
-import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate } from "lucide-react";
+import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate, Search } from "lucide-react";
 import { toast } from "sonner";
 import { TemplateThumbnail } from "@/components/TemplateThumbnail";
 
@@ -26,6 +26,21 @@ function Dashboard() {
   const { data, isLoading } = useQuery({ queryKey: ["pages"], queryFn: () => list() });
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published">("all");
+
+  const filteredPages = useMemo(() => {
+    if (!data?.pages) return [];
+    let pages = data.pages;
+    if (statusFilter !== "all") {
+      pages = pages.filter((p: any) => p.status === statusFilter);
+    }
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      pages = pages.filter((p: any) => p.name.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q));
+    }
+    return pages;
+  }, [data?.pages, statusFilter, search]);
 
   const mDel = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
@@ -104,6 +119,22 @@ function Dashboard() {
       </div>
 
       <div className="mt-10">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1 rounded-md border border-border bg-surface p-1">
+            {([["all", "Todas"], ["draft", "Rascunho"], ["published", "Publicada"]] as const).map(([key, label]) => (
+              <button key={key} onClick={() => setStatusFilter(key)}
+                className={`rounded px-3 py-1.5 text-xs transition ${statusFilter === key ? "bg-gradient-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="relative ml-auto w-full max-w-xs">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Buscar páginas..." value={search} onChange={e => setSearch(e.target.value)}
+              className="h-8 pl-8 text-sm" />
+          </div>
+        </div>
+
         {isLoading ? (
           <div className="grid place-items-center py-20 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>
         ) : !data?.pages.length ? (
@@ -112,9 +143,13 @@ function Dashboard() {
             <p className="mt-4 font-medium">Nenhuma página ainda</p>
             <p className="mt-1 text-sm text-muted-foreground">Crie sua primeira página acima.</p>
           </div>
+        ) : !filteredPages.length ? (
+          <div className="rounded-2xl border border-dashed border-border bg-surface/40 p-12 text-center">
+            <p className="text-sm text-muted-foreground">Nenhuma página encontrada para os filtros atuais.</p>
+          </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.pages.map((p: any) => {
+            {filteredPages.map((p: any) => {
               const published = p.status === "published";
               const publicUrl = `/p/${data.workspace!.slug}/${p.slug}`;
               return (

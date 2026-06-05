@@ -41,6 +41,8 @@ function Editor() {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiMode, setAiMode] = useState<"replace" | "append">("replace");
+  const [seo, setSeo] = useState({ title: "", description: "", ogImage: "" });
+  const [rightTab, setRightTab] = useState<"block" | "seo">("block");
   const history = useRef<PageContent[]>([]);
   const future = useRef<PageContent[]>([]);
   const dirty = useRef(false);
@@ -49,6 +51,8 @@ function Editor() {
     if (page) {
       setName(page.name);
       setContent((page.content as unknown as PageContent) || { sections: [] });
+      const pageSeo = (page as any).seo || {};
+      setSeo({ title: pageSeo.title || "", description: pageSeo.description || "", ogImage: pageSeo.ogImage || "" });
       history.current = [];
       future.current = [];
       dirty.current = false;
@@ -75,7 +79,7 @@ function Editor() {
   }
 
   const mSave = useMutation({
-    mutationFn: () => save({ data: { id, content, name } }),
+    mutationFn: () => save({ data: { id, content, name, seo } }),
     onSuccess: () => { dirty.current = false; toast.success("Salvo"); qc.invalidateQueries({ queryKey: ["pages"] }); },
     onError: (e: any) => toast.error(e.message),
   });
@@ -104,7 +108,7 @@ function Editor() {
     const t = setTimeout(() => { if (dirty.current) mSave.mutate(); }, 1500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, name]);
+  }, [content, name, seo]);
 
   function addBlock(type: SectionType) {
     const sec: Section = { id: newId(), type, props: { ...blockRegistry[type].defaultProps } };
@@ -238,10 +242,24 @@ function Editor() {
 
         {/* Right: properties */}
         <aside className="overflow-y-auto border-l border-border bg-surface p-4">
-          {selected ? (
-            <PropertiesPanel section={selected} onPatch={(p) => patchProps(selected.id, p)} />
+          <div className="mb-4 flex items-center gap-1 rounded-md border border-border bg-background p-1">
+            <button onClick={() => setRightTab("block")}
+              className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "block" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              Bloco
+            </button>
+            <button onClick={() => setRightTab("seo")}
+              className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "seo" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              SEO
+            </button>
+          </div>
+          {rightTab === "block" ? (
+            selected ? (
+              <PropertiesPanel section={selected} onPatch={(p) => patchProps(selected.id, p)} />
+            ) : (
+              <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
+            )
           ) : (
-            <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
+            <SeoPanel seo={seo} onChange={(next) => { setSeo(next); dirty.current = true; }} />
           )}
         </aside>
       </div>
@@ -381,6 +399,28 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="space-y-1.5">
       <label className="text-xs font-medium text-muted-foreground">{label}</label>
       {children}
+    </div>
+  );
+}
+
+function SeoPanel({ seo, onChange }: { seo: { title: string; description: string; ogImage: string }; onChange: (s: { title: string; description: string; ogImage: string }) => void }) {
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">Configurações de SEO</div>
+        <p className="mt-1 text-xs text-muted-foreground">Otimize como sua página aparece nos motores de busca e redes sociais.</p>
+      </div>
+      <Field label="Título da página (meta title)">
+        <Input value={seo.title} onChange={e => onChange({ ...seo, title: e.target.value })} placeholder="Meu produto — Descrição curta" />
+        <p className="text-[10px] text-muted-foreground">{seo.title.length}/60 caracteres</p>
+      </Field>
+      <Field label="Descrição (meta description)">
+        <Textarea rows={3} value={seo.description} onChange={e => onChange({ ...seo, description: e.target.value })} placeholder="Descreva sua página em até 160 caracteres..." />
+        <p className="text-[10px] text-muted-foreground">{seo.description.length}/160 caracteres</p>
+      </Field>
+      <Field label="Imagem OG (URL)">
+        <Input value={seo.ogImage} onChange={e => onChange({ ...seo, ogImage: e.target.value })} placeholder="https://meusite.com/imagem.jpg" />
+      </Field>
     </div>
   );
 }
