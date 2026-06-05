@@ -41,6 +41,8 @@ function Editor() {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiMode, setAiMode] = useState<"replace" | "append">("replace");
+  const [seo, setSeo] = useState({ title: "", description: "", ogImage: "" });
+  const [rightTab, setRightTab] = useState<"block" | "seo">("block");
   const history = useRef<PageContent[]>([]);
   const future = useRef<PageContent[]>([]);
   const dirty = useRef(false);
