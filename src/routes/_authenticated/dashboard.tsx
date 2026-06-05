@@ -26,6 +26,21 @@ function Dashboard() {
   const { data, isLoading } = useQuery({ queryKey: ["pages"], queryFn: () => list() });
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published">("all");
+
+  const filteredPages = useMemo(() => {
+    if (!data?.pages) return [];
+    let pages = data.pages;
+    if (statusFilter !== "all") {
+      pages = pages.filter((p: any) => p.status === statusFilter);
+    }
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      pages = pages.filter((p: any) => p.name.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q));
+    }
+    return pages;
+  }, [data?.pages, statusFilter, search]);
 
   const mDel = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
