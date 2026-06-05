@@ -242,10 +242,24 @@ function Editor() {
 
         {/* Right: properties */}
         <aside className="overflow-y-auto border-l border-border bg-surface p-4">
-          {selected ? (
-            <PropertiesPanel section={selected} onPatch={(p) => patchProps(selected.id, p)} />
+          <div className="mb-4 flex items-center gap-1 rounded-md border border-border bg-background p-1">
+            <button onClick={() => setRightTab("block")}
+              className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "block" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              Bloco
+            </button>
+            <button onClick={() => setRightTab("seo")}
+              className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "seo" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              SEO
+            </button>
+          </div>
+          {rightTab === "block" ? (
+            selected ? (
+              <PropertiesPanel section={selected} onPatch={(p) => patchProps(selected.id, p)} />
+            ) : (
+              <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
+            )
           ) : (
-            <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
+            <SeoPanel seo={seo} onChange={(next) => { setSeo(next); dirty.current = true; }} />
           )}
         </aside>
       </div>
