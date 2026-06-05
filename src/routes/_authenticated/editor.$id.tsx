@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, GripVertical, Smartphone, Monitor, Tablet, Undo2, Redo2, Sparkles, Search } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, GripVertical, Smartphone, Monitor, Tablet, Undo2, Redo2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { getPage, publishPage, savePage } from "@/lib/pages.functions";
 import { generatePageFromPrompt } from "@/lib/ai.functions";
