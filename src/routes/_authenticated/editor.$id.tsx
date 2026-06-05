@@ -79,7 +79,7 @@ function Editor() {
   }
 
   const mSave = useMutation({
-    mutationFn: () => save({ data: { id, content, name } }),
+    mutationFn: () => save({ data: { id, content, name, seo } }),
     onSuccess: () => { dirty.current = false; toast.success("Salvo"); qc.invalidateQueries({ queryKey: ["pages"] }); },
     onError: (e: any) => toast.error(e.message),
   });
