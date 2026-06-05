@@ -51,6 +51,8 @@ function Editor() {
     if (page) {
       setName(page.name);
       setContent((page.content as unknown as PageContent) || { sections: [] });
+      const pageSeo = (page as any).seo || {};
+      setSeo({ title: pageSeo.title || "", description: pageSeo.description || "", ogImage: pageSeo.ogImage || "" });
       history.current = [];
       future.current = [];
       dirty.current = false;
