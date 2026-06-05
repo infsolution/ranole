@@ -98,7 +98,7 @@ export const getPage = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data: page, error } = await supabase
       .from("pages")
-      .select("id, name, slug, status, content, theme, current_version, workspace_id, published_at, updated_at")
+      .select("id, name, slug, status, content, theme, seo, current_version, workspace_id, published_at, updated_at")
       .eq("id", data.id).single();
     if (error) throw new Error(error.message);
 
@@ -115,6 +115,11 @@ export const savePage = createServerFn({ method: "POST" })
       id: z.string().uuid(),
       content: z.object({ sections: z.array(z.any()) }),
       name: z.string().min(1).max(80).optional(),
+      seo: z.object({
+        title: z.string().max(80).optional(),
+        description: z.string().max(160).optional(),
+        ogImage: z.string().max(500).optional(),
+      }).optional(),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -125,11 +130,12 @@ export const savePage = createServerFn({ method: "POST" })
 
     const nextVersion = (current.current_version ?? 1) + 1;
 
-    const update: { content: any; current_version: number; name?: string } = {
+    const update: { content: any; current_version: number; name?: string; seo?: any } = {
       content: data.content as unknown as any,
       current_version: nextVersion,
     };
     if (data.name) update.name = data.name;
+    if (data.seo) update.seo = data.seo as unknown as any;
 
     const { error } = await supabase.from("pages").update(update).eq("id", data.id);
     if (error) throw new Error(error.message);
