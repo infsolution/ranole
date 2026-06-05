@@ -402,3 +402,25 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+function SeoPanel({ seo, onChange }: { seo: { title: string; description: string; ogImage: string }; onChange: (s: { title: string; description: string; ogImage: string }) => void }) {
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">Configurações de SEO</div>
+        <p className="mt-1 text-xs text-muted-foreground">Otimize como sua página aparece nos motores de busca e redes sociais.</p>
+      </div>
+      <Field label="Título da página (meta title)">
+        <Input value={seo.title} onChange={e => onChange({ ...seo, title: e.target.value })} placeholder="Meu produto — Descrição curta" />
+        <p className="text-[10px] text-muted-foreground">{seo.title.length}/60 caracteres</p>
+      </Field>
+      <Field label="Descrição (meta description)">
+        <Textarea rows={3} value={seo.description} onChange={e => onChange({ ...seo, description: e.target.value })} placeholder="Descreva sua página em até 160 caracteres..." />
+        <p className="text-[10px] text-muted-foreground">{seo.description.length}/160 caracteres</p>
+      </Field>
+      <Field label="Imagem OG (URL)">
+        <Input value={seo.ogImage} onChange={e => onChange({ ...seo, ogImage: e.target.value })} placeholder="https://meusite.com/imagem.jpg" />
+      </Field>
+    </div>
+  );
+}
