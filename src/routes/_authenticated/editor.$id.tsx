@@ -108,7 +108,7 @@ function Editor() {
     const t = setTimeout(() => { if (dirty.current) mSave.mutate(); }, 1500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, name]);
+  }, [content, name, seo]);
 
   function addBlock(type: SectionType) {
     const sec: Section = { id: newId(), type, props: { ...blockRegistry[type].defaultProps } };
