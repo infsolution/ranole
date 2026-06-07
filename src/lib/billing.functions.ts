@@ -176,6 +176,10 @@ export const refreshSubscription = createServerFn({ method: "POST" })
     const plan = match?.plan.id || "free";
     const cycle = match?.cycle || null;
 
+    const item = active.items.data[0];
+    const periodStart = item?.current_period_start ?? null;
+    const periodEnd = item?.current_period_end ?? null;
+
     await supabaseAdmin.from("workspace_subscriptions").upsert(
       {
         workspace_id: ws.id,
@@ -184,8 +188,8 @@ export const refreshSubscription = createServerFn({ method: "POST" })
         status: active.status as never,
         stripe_subscription_id: active.id,
         stripe_price_id: priceId,
-        current_period_start: new Date(active.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(active.current_period_end * 1000).toISOString(),
+        current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+        current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
         cancel_at_period_end: active.cancel_at_period_end,
         trial_end: active.trial_end ? new Date(active.trial_end * 1000).toISOString() : null,
       },
