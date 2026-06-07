@@ -205,6 +205,54 @@ export type Database = {
           },
         ]
       }
+      workspace_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          cycle: Database["public"]["Enums"]["billing_cycle"] | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          trial_end: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          cycle?: Database["public"]["Enums"]["billing_cycle"] | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          cycle?: Database["public"]["Enums"]["billing_cycle"] | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       workspaces: {
         Row: {
           created_at: string
@@ -212,6 +260,7 @@ export type Database = {
           name: string
           owner_id: string
           slug: string
+          stripe_customer_id: string | null
           updated_at: string
         }
         Insert: {
@@ -220,6 +269,7 @@ export type Database = {
           name: string
           owner_id: string
           slug: string
+          stripe_customer_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -228,6 +278,7 @@ export type Database = {
           name?: string
           owner_id?: string
           slug?: string
+          stripe_customer_id?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -243,7 +294,18 @@ export type Database = {
       }
     }
     Enums: {
+      billing_cycle: "monthly" | "yearly"
       page_status: "draft" | "published" | "archived"
+      subscription_plan: "free" | "pro" | "business"
+      subscription_status:
+        | "active"
+        | "trialing"
+        | "past_due"
+        | "canceled"
+        | "incomplete"
+        | "incomplete_expired"
+        | "unpaid"
+        | "paused"
       workspace_role: "owner" | "admin" | "editor" | "viewer"
     }
     CompositeTypes: {
@@ -372,7 +434,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      billing_cycle: ["monthly", "yearly"],
       page_status: ["draft", "published", "archived"],
+      subscription_plan: ["free", "pro", "business"],
+      subscription_status: [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "incomplete",
+        "incomplete_expired",
+        "unpaid",
+        "paused",
+      ],
       workspace_role: ["owner", "admin", "editor", "viewer"],
     },
   },
