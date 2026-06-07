@@ -36,6 +36,10 @@ function Layout() {
                 className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/dashboard") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 <LayoutDashboard className="h-4 w-4" /> Páginas
               </Link>
+              <Link to="/billing"
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/billing") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                <CreditCard className="h-4 w-4" /> Billing
+              </Link>
             </nav>
           </div>
           <button onClick={logout} className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
