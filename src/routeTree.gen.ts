@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as PWorkspaceSlugRouteImport } from './routes/p.$workspace.$slug'
 import { Route as AuthenticatedEditorIdRouteImport } from './routes/_authenticated/editor.$id'
 import { Route as AuthenticatedAnalyticsIdRouteImport } from './routes/_authenticated/analytics.$id'
@@ -36,6 +37,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const PWorkspaceSlugRoute = PWorkspaceSlugRouteImport.update({
   id: '/p/$workspace/$slug',
   path: '/p/$workspace/$slug',
@@ -56,6 +62,7 @@ const AuthenticatedAnalyticsIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/_authenticated/editor/$id': typeof AuthenticatedEditorIdRoute
@@ -84,6 +93,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/billing'
     | '/dashboard'
     | '/analytics/$id'
     | '/editor/$id'
@@ -92,6 +102,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/billing'
     | '/dashboard'
     | '/analytics/$id'
     | '/editor/$id'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/billing'
     | '/_authenticated/dashboard'
     | '/_authenticated/analytics/$id'
     | '/_authenticated/editor/$id'
@@ -144,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/p/$workspace/$slug': {
       id: '/p/$workspace/$slug'
       path: '/p/$workspace/$slug'
@@ -169,12 +188,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedAnalyticsIdRoute: typeof AuthenticatedAnalyticsIdRoute
   AuthenticatedEditorIdRoute: typeof AuthenticatedEditorIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedAnalyticsIdRoute: AuthenticatedAnalyticsIdRoute,
   AuthenticatedEditorIdRoute: AuthenticatedEditorIdRoute,
@@ -193,13 +214,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

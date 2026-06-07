@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, LogOut, Sparkles } from "lucide-react";
+import { LayoutDashboard, LogOut, Sparkles, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -35,6 +35,10 @@ function Layout() {
               <Link to="/dashboard"
                 className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/dashboard") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 <LayoutDashboard className="h-4 w-4" /> Páginas
+              </Link>
+              <Link to="/billing"
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/billing") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                <CreditCard className="h-4 w-4" /> Billing
               </Link>
             </nav>
           </div>
