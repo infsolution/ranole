@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as PWorkspaceSlugRouteImport } from './routes/p.$workspace.$slug'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as AuthenticatedEditorIdRouteImport } from './routes/_authenticated/editor.$id'
 import { Route as AuthenticatedAnalyticsIdRouteImport } from './routes/_authenticated/analytics.$id'
 
@@ -47,6 +48,11 @@ const PWorkspaceSlugRoute = PWorkspaceSlugRouteImport.update({
   path: '/p/$workspace/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedEditorIdRoute = AuthenticatedEditorIdRouteImport.update({
   id: '/editor/$id',
   path: '/editor/$id',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
 export interface FileRoutesByTo {
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
 export interface FileRoutesById {
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/_authenticated/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
 export interface FileRouteTypes {
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/analytics/$id'
     | '/editor/$id'
+    | '/api/public/stripe-webhook'
     | '/p/$workspace/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/analytics/$id'
     | '/editor/$id'
+    | '/api/public/stripe-webhook'
     | '/p/$workspace/$slug'
   id:
     | '__root__'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/analytics/$id'
     | '/_authenticated/editor/$id'
+    | '/api/public/stripe-webhook'
     | '/p/$workspace/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -123,6 +135,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   PWorkspaceSlugRoute: typeof PWorkspaceSlugRoute
 }
 
@@ -170,6 +183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PWorkspaceSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/editor/$id': {
       id: '/_authenticated/editor/$id'
       path: '/editor/$id'
@@ -209,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   PWorkspaceSlugRoute: PWorkspaceSlugRoute,
 }
 export const routeTree = rootRouteImport
