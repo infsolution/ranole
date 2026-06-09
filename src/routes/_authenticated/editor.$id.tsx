@@ -332,12 +332,53 @@ function SortableRow({ section, selected, onSelect, onMoveUp, onMoveDown, onDele
 function PropertiesPanel({ section, onPatch }: { section: Section; onPatch: (p: Record<string, unknown>) => void }) {
   const def = blockRegistry[section.type];
   const p: any = section.props;
+  const colors: any = p.colors || {};
+  const setColor = (key: "bg" | "text" | "border" | "shadow", value: string) => {
+    const next = { ...colors, [key]: value };
+    if (!value) delete next[key];
+    onPatch({ colors: next });
+  };
   return (
     <div className="space-y-4">
       <div>
         <div className="text-xs uppercase tracking-wider text-muted-foreground">Bloco</div>
         <div className="mt-1 flex items-center gap-2 font-semibold"><def.icon className="h-4 w-4" /> {def.label}</div>
       </div>
+
+      <details className="rounded-md border border-border bg-background" open>
+        <summary className="cursor-pointer list-none px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Cores
+        </summary>
+        <div className="space-y-2 border-t border-border p-3">
+          {([
+            ["bg", "Fundo"],
+            ["text", "Texto"],
+            ["border", "Borda"],
+            ["shadow", "Sombra"],
+          ] as const).map(([k, label]) => (
+            <div key={k} className="flex items-center gap-2">
+              <label className="flex-1 text-xs text-muted-foreground">{label}</label>
+              <input
+                type="color"
+                value={colors[k] || "#000000"}
+                onChange={(e) => setColor(k, e.target.value)}
+                className="h-7 w-10 cursor-pointer rounded border border-border bg-transparent"
+              />
+              <Input
+                value={colors[k] || ""}
+                onChange={(e) => setColor(k, e.target.value)}
+                placeholder="—"
+                className="h-7 w-24 text-xs"
+              />
+              {colors[k] && (
+                <button onClick={() => setColor(k, "")} className="text-xs text-muted-foreground hover:text-destructive">×</button>
+              )}
+            </div>
+          ))}
+        </div>
+      </details>
+
+
       {def.schema.map(field => {
         if (field.type === "text") {
           return (
