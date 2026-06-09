@@ -14,6 +14,25 @@ import {
 } from "lucide-react";
 import type { SectionType } from "./types";
 
+/* ============== Color helper ============== */
+
+export interface BlockColors {
+  bg?: string;
+  text?: string;
+  border?: string;
+  shadow?: string;
+}
+
+export function sectionStyle(p: any): React.CSSProperties {
+  const c: BlockColors = p?.colors || {};
+  const s: React.CSSProperties = {};
+  if (c.bg) s.background = c.bg;
+  if (c.text) s.color = c.text;
+  if (c.border) s.borderColor = c.border;
+  if (c.shadow) s.boxShadow = `0 20px 60px -20px ${c.shadow}`;
+  return s;
+}
+
 /* ============== Block components ============== */
 
 function Hero(p: any) {
