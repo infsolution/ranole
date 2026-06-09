@@ -37,7 +37,7 @@ export function sectionStyle(p: any): React.CSSProperties {
 
 function Hero(p: any) {
   return (
-    <section className="relative overflow-hidden bg-hero ring-grid">
+    <section className="relative overflow-hidden bg-hero ring-grid" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6 py-24 md:py-32 text-center">
         {p.eyebrow && (
           <span className="inline-block rounded-full border border-border bg-surface-elevated/60 px-3 py-1 text-xs uppercase tracking-widest text-muted-foreground">
@@ -68,7 +68,7 @@ function Hero(p: any) {
 function Benefits(p: any) {
   const items: Array<{ title: string; description: string }> = p.items || [];
   return (
-    <section className="bg-background py-24">
+    <section className="bg-background py-24" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6">
         {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
         {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
@@ -91,7 +91,7 @@ function Benefits(p: any) {
 function Features(p: any) {
   const items: Array<{ title: string; description: string }> = p.items || [];
   return (
-    <section className="bg-surface py-24">
+    <section className="bg-surface py-24" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6">
         {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
         {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
@@ -111,7 +111,7 @@ function Features(p: any) {
 function Pricing(p: any) {
   const items: Array<{ name: string; price: string; period?: string; description?: string; features?: string; ctaText?: string; ctaHref?: string; highlight?: string }> = p.items || [];
   return (
-    <section className="bg-background py-24">
+    <section className="bg-background py-24" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6">
         {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
         {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
@@ -151,7 +151,7 @@ function Pricing(p: any) {
 function Logos(p: any) {
   const items: Array<{ name: string }> = p.items || [];
   return (
-    <section className="bg-surface py-16">
+    <section className="bg-surface py-16" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6">
         {p.title && <p className="mb-8 text-center text-sm uppercase tracking-widest text-muted-foreground">{p.title}</p>}
         <div className="grid grid-cols-2 items-center gap-8 md:grid-cols-3 lg:grid-cols-6">
@@ -169,7 +169,7 @@ function Logos(p: any) {
 function Stats(p: any) {
   const items: Array<{ value: string; label: string }> = p.items || [];
   return (
-    <section className="bg-background py-20">
+    <section className="bg-background py-20" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6">
         {p.title && <h2 className="mb-12 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
         <div className="grid gap-8 md:grid-cols-4">
@@ -187,7 +187,7 @@ function Stats(p: any) {
 
 function CTA(p: any) {
   return (
-    <section className="bg-background py-24">
+    <section className="bg-background py-24" style={sectionStyle(p)}>
       <div className="mx-auto max-w-5xl px-6">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-primary p-12 text-center shadow-elegant">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">{p.title}</h2>
@@ -206,7 +206,7 @@ function CTA(p: any) {
 function FAQ(p: any) {
   const items: Array<{ q: string; a: string }> = p.items || [];
   return (
-    <section className="bg-surface py-24">
+    <section className="bg-surface py-24" style={sectionStyle(p)}>
       <div className="mx-auto max-w-3xl px-6">
         {p.title && <h2 className="mb-10 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
         <div className="space-y-3">
@@ -228,7 +228,7 @@ function FAQ(p: any) {
 function Testimonials(p: any) {
   const items: Array<{ name: string; role: string; quote: string }> = p.items || [];
   return (
-    <section className="bg-background py-24">
+    <section className="bg-background py-24" style={sectionStyle(p)}>
       <div className="mx-auto max-w-6xl px-6">
         {p.title && <h2 className="mb-12 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
         <div className="grid gap-6 md:grid-cols-3">
@@ -248,7 +248,7 @@ function Testimonials(p: any) {
 
 function Contact(p: any) {
   return (
-    <section className="bg-surface py-24">
+    <section className="bg-surface py-24" style={sectionStyle(p)}>
       <div className="mx-auto grid max-w-5xl gap-10 px-6 md:grid-cols-2">
         <div>
           {p.title && <h2 className="text-3xl md:text-4xl font-bold">{p.title}</h2>}
@@ -271,7 +271,7 @@ function Contact(p: any) {
 
 function Footer(p: any) {
   return (
-    <footer className="border-t border-border bg-surface py-10">
+    <footer className="border-t border-border bg-surface py-10" style={sectionStyle(p)}>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
         <p className="text-sm text-muted-foreground">{p.copyright}</p>
         <p className="text-sm text-muted-foreground">{p.tagline}</p>
