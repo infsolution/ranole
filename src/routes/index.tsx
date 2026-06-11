@@ -185,11 +185,7 @@ function DemoStrip() {
   );
 }
 
-const tiers = [
-  { name: "Starter", price: "R$0", desc: "Para validar ideias.", features: ["1 workspace", "3 páginas", "Subdomínio Indigo"] },
-  { name: "Pro", price: "R$49", desc: "Para criadores e PMEs.", features: ["Workspaces ilimitados", "Páginas ilimitadas", "Domínio customizado", "Analytics"], featured: true },
-  { name: "Agency", price: "R$199", desc: "Para agências e times.", features: ["Multi-tenant completo", "Papéis avançados", "API & webhooks", "SLA"] },
-];
+import { PLANS } from "@/lib/billing";
 
 function Pricing() {
   return (
@@ -197,25 +193,29 @@ function Pricing() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl md:text-5xl font-bold">Preços simples</h2>
-          <p className="mt-4 text-muted-foreground">Comece grátis. Escale quando precisar.</p>
+          <p className="mt-4 text-muted-foreground">Comece grátis. Faça upgrade quando precisar.</p>
         </div>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {tiers.map((t) => (
-            <div key={t.name} className={`rounded-2xl border p-8 ${t.featured ? "border-primary bg-gradient-primary/10 shadow-glow" : "border-border bg-surface"}`}>
-              <h3 className="font-display text-xl font-semibold">{t.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{t.desc}</p>
-              <div className="mt-6 flex items-end gap-1">
-                <span className="font-display text-4xl font-bold">{t.price}</span>
-                <span className="text-sm text-muted-foreground">/mês</span>
+          {PLANS.map((t) => {
+            const featured = !!t.highlight;
+            const price = t.prices.monthly.amountUsd;
+            return (
+              <div key={t.id} className={`rounded-2xl border p-8 ${featured ? "border-primary bg-gradient-primary/10 shadow-glow" : "border-border bg-surface"}`}>
+                <h3 className="font-display text-xl font-semibold">{t.name}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{t.tagline}</p>
+                <div className="mt-6 flex items-end gap-1">
+                  <span className="font-display text-4xl font-bold">${price}</span>
+                  <span className="text-sm text-muted-foreground">/mês</span>
+                </div>
+                <ul className="mt-6 space-y-2 text-sm">
+                  {t.features.map(f => <li key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-primary-glow" />{f}</li>)}
+                </ul>
+                <Link to="/login" className={`mt-8 inline-flex w-full justify-center rounded-md px-4 py-2.5 font-medium ${featured ? "bg-gradient-primary text-primary-foreground shadow-glow" : "border border-border bg-surface-elevated"}`}>
+                  Começar
+                </Link>
               </div>
-              <ul className="mt-6 space-y-2 text-sm">
-                {t.features.map(f => <li key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-primary-glow" />{f}</li>)}
-              </ul>
-              <Link to="/login" className={`mt-8 inline-flex w-full justify-center rounded-md px-4 py-2.5 font-medium ${t.featured ? "bg-gradient-primary text-primary-foreground shadow-glow" : "border border-border bg-surface-elevated"}`}>
-                Começar
-              </Link>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
