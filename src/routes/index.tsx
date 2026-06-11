@@ -224,8 +224,8 @@ function Pricing() {
 
 const faqs = [
   { q: "Como funciona o builder?", a: "Arraste blocos prontos, edite propriedades e publique. Tudo é salvo como JSON versionado." },
-  { q: "Tenho domínio próprio?", a: "Sim, no plano Pro. No Starter você usa subdomínio Indigo." },
-  { q: "É multi-tenant?", a: "Sim. Cada workspace tem isolamento por RLS e membros com papéis." },
+  { q: "Onde minha página é publicada?", a: "Em um subdomínio do Indigo no formato /p/seu-workspace/sua-pagina. Domínio próprio ainda não está disponível." },
+  { q: "Posso usar IA para gerar conteúdo?", a: "Sim. O editor inclui geração de conteúdo com IA em todos os planos." },
   { q: "Posso exportar minha página?", a: "Em breve. A v0 foca em publicação no nosso host." },
 ];
 
