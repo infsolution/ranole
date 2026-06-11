@@ -223,7 +223,7 @@ function normalizeSection(section: LooseSection): Section | null {
   if (!type) return null;
   const def = blockRegistry[type];
   const props = section.props || {};
-  const defaults = def.defaultProps as Record<string, any>;
+  const defaults = def.defaultProps;
 
   const normalizedProps: Record<string, unknown> = (() => {
     switch (type) {
@@ -260,7 +260,7 @@ function normalizeSection(section: LooseSection): Section | null {
             price: text(item.price || item.valor, "Sob consulta"),
             period: text(item.period || item.periodo),
             description: text(item.description || item.subtitle),
-            features: featureLines(item.features || item.recursos || item.items, defaults.items?.[0]?.features),
+            features: featureLines(item.features || item.recursos || item.items, defaultPricingFeatures(defaults)),
             ctaText: text(item.ctaText || item.cta || item.buttonText, "Comprar agora"),
             ctaHref: text(item.ctaHref || item.href || item.link, "#"),
             highlight: item.highlight === true ? "true" : text(item.highlight),
@@ -371,8 +371,12 @@ function extractJson(raw: string): unknown {
     .replace(/[\u0000-\u001f]+/g, " ");
   const parsed = JSON.parse(slice);
   if (Array.isArray(parsed)) return { sections: parsed };
-  if (parsed && typeof parsed === "object" && Array.isArray((parsed as any).sections)) return parsed;
-  if (parsed && typeof parsed === "object" && Array.isArray((parsed as any).page?.sections)) return (parsed as any).page;
+  if (parsed && typeof parsed === "object") {
+    const parsedObject = parsed as Record<string, unknown>;
+    if (Array.isArray(parsedObject.sections)) return parsedObject;
+    const page = parsedObject.page;
+    if (page && typeof page === "object" && Array.isArray((page as Record<string, unknown>).sections)) return page;
+  }
   return parsed;
 }
 
@@ -385,7 +389,7 @@ function validateGeneratedContent(content: PageContent): PageContent {
   return content;
 }
 
-function safeGenerationError(err: any) {
+function safeGenerationError(err: unknown) {
   const msg = String(err?.message || err || "");
   if (msg.includes("429")) return "Limite de uso de IA atingido. Tente novamente em instantes.";
   if (msg.includes("402")) return "Créditos de IA esgotados. Adicione créditos no workspace.";
@@ -397,7 +401,7 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({ prompt: z.string().min(4).max(2000) }).parse(d),
   )
-  .handler(async ({ data }): Promise<{ content: any }> => {
+  .handler(async ({ data }): Promise<{ content: PageContent }> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("LOVABLE_API_KEY ausente");
 
@@ -431,7 +435,7 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
         output = await tryRawJson();
       }
       return { content: validateGeneratedContent(fillSections(output)) };
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw new Error(safeGenerationError(err));
     }
   });
