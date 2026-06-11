@@ -108,6 +108,30 @@ export const getPage = createServerFn({ method: "GET" })
     return { ...page, workspace_slug: ws?.slug ?? null };
   });
 
+function sanitizeHref(val: unknown): string {
+  if (typeof val !== "string") return "#";
+  const clean = val.trim();
+  if (clean === "") return "#";
+  if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(clean)) return clean;
+  return "#";
+}
+
+function sanitizeContentHrefs(content: any): any {
+  if (Array.isArray(content)) return content.map(sanitizeContentHrefs);
+  if (content && typeof content === "object") {
+    const out: any = {};
+    for (const [k, v] of Object.entries(content)) {
+      if (/href$/i.test(k) || k === "url" || k === "link") {
+        out[k] = sanitizeHref(v);
+      } else {
+        out[k] = sanitizeContentHrefs(v);
+      }
+    }
+    return out;
+  }
+  return content;
+}
+
 export const savePage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
@@ -130,12 +154,17 @@ export const savePage = createServerFn({ method: "POST" })
 
     const nextVersion = (current.current_version ?? 1) + 1;
 
+    const sanitizedContent = sanitizeContentHrefs(data.content);
+    const sanitizedSeo = data.seo
+      ? { ...data.seo, ogImage: data.seo.ogImage ? sanitizeHref(data.seo.ogImage) : undefined }
+      : undefined;
+
     const update: { content: any; current_version: number; name?: string; seo?: any } = {
-      content: data.content as unknown as any,
+      content: sanitizedContent as unknown as any,
       current_version: nextVersion,
     };
     if (data.name) update.name = data.name;
-    if (data.seo) update.seo = data.seo as unknown as any;
+    if (sanitizedSeo) update.seo = sanitizedSeo as unknown as any;
 
     const { error } = await supabase.from("pages").update(update).eq("id", data.id);
     if (error) throw new Error(error.message);
