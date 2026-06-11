@@ -172,7 +172,7 @@ export const savePage = createServerFn({ method: "POST" })
     await supabase.from("page_versions").insert({
       page_id: data.id,
       version: nextVersion,
-      content: data.content as unknown as any,
+      content: sanitizedContent as unknown as any,
       created_by: userId,
     });
 
