@@ -414,7 +414,9 @@ function extractJson(raw: string): unknown {
   const slice = clean
     .slice(start, end >= start ? end + 1 : undefined)
     .replace(/,\s*([}\]])/g, "$1")
-    .replace(/[\u0000-\u001f]+/g, " ");
+    .split("")
+    .map((char) => (char.charCodeAt(0) < 32 ? " " : char))
+    .join("");
   const parsed = JSON.parse(slice);
   if (Array.isArray(parsed)) return { sections: parsed };
   if (parsed && typeof parsed === "object") {
