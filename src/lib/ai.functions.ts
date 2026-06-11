@@ -99,7 +99,7 @@ const looseSectionSchema = z.object({
 }).passthrough();
 
 const loosePageSchema = z.object({
-  sections: z.array(looseSectionSchema).min(1).max(10),
+  sections: z.array(looseSectionSchema).min(1).max(20),
 }).passthrough();
 
 type LooseSection = z.infer<typeof looseSectionSchema>;
@@ -213,13 +213,14 @@ function normalizeSection(section: LooseSection): Section | null {
         };
       case "benefits":
       case "features": {
+        const maxItems = type === "benefits" ? 8 : 12;
         const normalizedItems = items(props.items || props.benefits || props.features)
           .map((item) => ({
             title: text(item.title || item.name || item.label),
             description: text(item.description || item.text || item.subtitle),
           }))
           .filter((item) => item.title || item.description)
-          .slice(0, 12);
+          .slice(0, maxItems);
         return {
           title: text(props.title, defaults.title),
           subtitle: text(props.subtitle || props.description, defaults.subtitle),
