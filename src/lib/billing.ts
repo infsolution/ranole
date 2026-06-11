@@ -15,10 +15,11 @@ export const PLANS: {
     name: "Free",
     tagline: "Para começar a explorar",
     features: [
-      "1 página publicada",
-      "Subdomínio Indigo",
       "Editor visual completo",
-      "Analytics básico",
+      "Templates prontos",
+      "Publicação em subdomínio",
+      "Geração de conteúdo com IA",
+      "Analytics de visualizações",
     ],
     prices: {
       monthly: { amountUsd: 0, priceId: null },
@@ -30,11 +31,10 @@ export const PLANS: {
     name: "Pro",
     tagline: "Para criadores e freelancers",
     features: [
-      "10 páginas publicadas",
-      "Geração com IA ilimitada",
-      "SEO avançado e Open Graph",
+      "Tudo do Free",
+      "Geração com IA prioritária",
       "Templates premium",
-      "Sem marca Indigo",
+      "Suporte por e-mail",
     ],
     highlight: true,
     prices: {
@@ -47,10 +47,8 @@ export const PLANS: {
     name: "Business",
     tagline: "Para agências e times",
     features: [
-      "Páginas ilimitadas",
-      "Domínio próprio",
-      "Workspaces com múltiplos membros",
-      "Analytics detalhado",
+      "Tudo do Pro",
+      "Cobrança anual com 2 meses grátis",
       "Suporte prioritário",
     ],
     prices: {
