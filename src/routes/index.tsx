@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Sparkles, Zap, Layers, Palette, Globe, BarChart3, ArrowRight, Check } from "lucide-react";
+import ranoleLogo from "@/assets/ranole-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
