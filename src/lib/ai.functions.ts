@@ -382,9 +382,9 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
         model,
         system: systemPrompt(),
         prompt: `Brief: ${data.prompt}`,
-        experimental_output: Output.object({ schema: pageSchema }),
+        experimental_output: Output.object({ schema: loosePageSchema }),
       });
-      return experimental_output;
+      return parseLoosePage(experimental_output);
     };
 
     const tryRawJson = async () => {
@@ -393,26 +393,18 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
         system: systemPrompt() + `\n\nRetorne APENAS um JSON válido, sem markdown, sem cercas \`\`\`, no formato: {"sections":[{"type":"hero","props":{...}}, ...]}.`,
         prompt: `Brief: ${data.prompt}`,
       });
-      const clean = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
-      const start = clean.indexOf("{");
-      const end = clean.lastIndexOf("}");
-      const slice = start >= 0 && end > start ? clean.slice(start, end + 1) : clean;
-      const parsed = JSON.parse(slice);
-      return pageSchema.parse(parsed);
+      return parseLoosePage(extractJson(text));
     };
 
     try {
-      let output: z.infer<typeof pageSchema>;
+      let output: LoosePage;
       try {
         output = await tryStructured();
       } catch {
         output = await tryRawJson();
       }
-      return { content: fillSections(output) };
+      return { content: validateGeneratedContent(fillSections(output)) };
     } catch (err: any) {
-      const msg = err?.message || "";
-      if (msg.includes("429")) throw new Error("Limite de uso de IA atingido. Tente novamente em instantes.");
-      if (msg.includes("402")) throw new Error("Créditos de IA esgotados. Adicione créditos no workspace.");
-      throw new Error(`Falha ao gerar página: ${msg || "erro desconhecido"}`);
+      throw new Error(safeGenerationError(err));
     }
   });
