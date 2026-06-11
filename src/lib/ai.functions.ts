@@ -20,7 +20,7 @@ const heroProps = z.object({
 const benefitsProps = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
-  items: z.array(z.object({ title: z.string(), description: z.string() })).min(2).max(6),
+  items: z.array(z.object({ title: z.string(), description: z.string() })).min(1).max(8),
 });
 const ctaProps = z.object({
   title: z.string(),
@@ -30,11 +30,11 @@ const ctaProps = z.object({
 });
 const faqProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ q: z.string(), a: z.string() })).min(2).max(8),
+  items: z.array(z.object({ q: z.string(), a: z.string() })).min(1).max(10),
 });
 const testimonialsProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ name: z.string(), role: z.string(), quote: z.string() })).min(2).max(6),
+  items: z.array(z.object({ name: z.string(), role: z.string(), quote: z.string() })).min(1).max(8),
 });
 const footerProps = z.object({
   copyright: z.string(),
@@ -43,7 +43,7 @@ const footerProps = z.object({
 const featuresProps = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
-  items: z.array(z.object({ title: z.string(), description: z.string() })).min(3).max(9),
+  items: z.array(z.object({ title: z.string(), description: z.string() })).min(1).max(12),
 });
 const pricingProps = z.object({
   title: z.string().optional(),
@@ -57,15 +57,15 @@ const pricingProps = z.object({
     ctaText: z.string().optional(),
     ctaHref: z.string().optional(),
     highlight: z.string().optional(),
-  })).min(2).max(4),
+  })).min(1).max(4),
 });
 const logosProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ name: z.string() })).min(3).max(8),
+  items: z.array(z.object({ name: z.string() })).min(1).max(12),
 });
 const statsProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ value: z.string(), label: z.string() })).min(2).max(6),
+  items: z.array(z.object({ value: z.string(), label: z.string() })).min(1).max(8),
 });
 const contactProps = z.object({
   title: z.string(),
@@ -134,14 +134,38 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
     const gateway = createLovableAiGatewayProvider(key);
     const model = gateway("google/gemini-3-flash-preview");
 
-    try {
+    const tryStructured = async () => {
       const { experimental_output } = await generateText({
         model,
         system: systemPrompt(),
         prompt: `Brief: ${data.prompt}`,
         experimental_output: Output.object({ schema: pageSchema }),
       });
-      return { content: fillSections(experimental_output) };
+      return experimental_output;
+    };
+
+    const tryRawJson = async () => {
+      const { text } = await generateText({
+        model,
+        system: systemPrompt() + `\n\nRetorne APENAS um JSON válido, sem markdown, sem cercas \`\`\`, no formato: {"sections":[{"type":"hero","props":{...}}, ...]}.`,
+        prompt: `Brief: ${data.prompt}`,
+      });
+      const clean = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+      const start = clean.indexOf("{");
+      const end = clean.lastIndexOf("}");
+      const slice = start >= 0 && end > start ? clean.slice(start, end + 1) : clean;
+      const parsed = JSON.parse(slice);
+      return pageSchema.parse(parsed);
+    };
+
+    try {
+      let output: z.infer<typeof pageSchema>;
+      try {
+        output = await tryStructured();
+      } catch {
+        output = await tryRawJson();
+      }
+      return { content: fillSections(output) };
     } catch (err: any) {
       const msg = err?.message || "";
       if (msg.includes("429")) throw new Error("Limite de uso de IA atingido. Tente novamente em instantes.");
