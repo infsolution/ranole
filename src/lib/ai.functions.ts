@@ -122,9 +122,49 @@ Regras:
 - Não retorne markdown nem comentários, apenas o JSON exigido pelo schema.`;
 }
 
-function text(value: unknown, fallback = ""): string {
-  if (value === undefined || value === null) return fallback;
-  if (Array.isArray(value)) return value.map((item) => text(item)).filter(Boolean).join("\n");
+function text(value: unknown, fallback: unknown = ""): string {
+  const target = value === undefined || value === null ? fallback : value;
+  if (target === undefined || target === null) return "";
+  if (Array.isArray(target)) return target.map((item) => text(item)).filter(Boolean).join("\n");
+  if (typeof target === "object") return "";
+  return String(target);
+}
+
+function defaultPricingFeatures(defaults: Record<string, unknown>): string {
+  const defaultItems = defaults.items;
+  if (!Array.isArray(defaultItems)) return "";
+  const first = defaultItems[0];
+  if (!first || typeof first !== "object" || Array.isArray(first)) return "";
+  return text((first as Record<string, unknown>).features);
+}
+
+function featureLines(value: unknown, fallback: unknown = ""): string {
+  if (typeof value === "string") return value;
+  if (!Array.isArray(value)) return text(fallback);
+  return value
+    .map((item) => {
+      if (typeof item === "string") return item;
+      if (item && typeof item === "object") {
+        const obj = item as Record<string, unknown>;
+        const title = text(obj.title || obj.name || obj.label);
+        const description = text(obj.description || obj.text);
+        return [title, description].filter(Boolean).join(": ");
+      }
+      return text(item);
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
+function items(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is Record<string, unknown> => !!item && typeof item === "object" && !Array.isArray(item))
+    : [];
+}
+
+function normalizeType(value: unknown): SectionType | null {
+  const normalized = text(value).trim().toLowerCase().replace(/[\s_-]/g, "");
+  const aliases: Record<string, SectionType> = {
   if (typeof value === "object") return fallback;
   return String(value);
 }
