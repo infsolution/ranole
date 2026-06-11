@@ -165,37 +165,6 @@ function items(value: unknown): Record<string, unknown>[] {
 function normalizeType(value: unknown): SectionType | null {
   const normalized = text(value).trim().toLowerCase().replace(/[\s_-]/g, "");
   const aliases: Record<string, SectionType> = {
-  if (typeof value === "object") return fallback;
-  return String(value);
-}
-
-function items(value: unknown): Record<string, unknown>[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is Record<string, unknown> => !!item && typeof item === "object" && !Array.isArray(item))
-    : [];
-}
-
-function featureLines(value: unknown, fallback = ""): string {
-  if (typeof value === "string") return value;
-  if (!Array.isArray(value)) return fallback;
-  return value
-    .map((item) => {
-      if (typeof item === "string") return item;
-      if (item && typeof item === "object") {
-        const obj = item as Record<string, unknown>;
-        const title = text(obj.title || obj.name || obj.label);
-        const description = text(obj.description || obj.text);
-        return [title, description].filter(Boolean).join(": ");
-      }
-      return text(item);
-    })
-    .filter(Boolean)
-    .join("\n");
-}
-
-function normalizeType(value: unknown): SectionType | null {
-  const normalized = text(value).trim().toLowerCase().replace(/[\s_-]/g, "");
-  const aliases: Record<string, SectionType> = {
     hero: "hero",
     headline: "hero",
     benefits: "benefits",
