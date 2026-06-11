@@ -390,7 +390,7 @@ function validateGeneratedContent(content: PageContent): PageContent {
 }
 
 function safeGenerationError(err: unknown) {
-  const msg = String(err?.message || err || "");
+  const msg = err instanceof Error ? err.message : String(err || "");
   if (msg.includes("429")) return "Limite de uso de IA atingido. Tente novamente em instantes.";
   if (msg.includes("402")) return "Créditos de IA esgotados. Adicione créditos no workspace.";
   return "Falha ao gerar página. Tente novamente com um prompt um pouco mais específico.";
@@ -401,7 +401,7 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({ prompt: z.string().min(4).max(2000) }).parse(d),
   )
-  .handler(async ({ data }): Promise<{ content: PageContent }> => {
+  .handler(async ({ data }): Promise<{ content: unknown }> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("LOVABLE_API_KEY ausente");
 
