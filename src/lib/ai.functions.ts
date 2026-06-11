@@ -121,6 +121,10 @@ const loosePageSchema = z.object({
 
 type LooseSection = z.infer<typeof looseSectionSchema>;
 type LoosePage = z.infer<typeof loosePageSchema>;
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type SerializablePageContent = {
+  sections: Array<{ id: string; type: SectionType; props: { [key: string]: JsonValue } }>;
+};
 
 function systemPrompt() {
   const blocks = Object.values(blockRegistry)
@@ -389,6 +393,10 @@ function validateGeneratedContent(content: PageContent): PageContent {
   return content;
 }
 
+function serializableContent(content: PageContent): SerializablePageContent {
+  return content as unknown as SerializablePageContent;
+}
+
 function safeGenerationError(err: unknown) {
   const msg = err instanceof Error ? err.message : String(err || "");
   if (msg.includes("429")) return "Limite de uso de IA atingido. Tente novamente em instantes.";
@@ -401,7 +409,7 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({ prompt: z.string().min(4).max(2000) }).parse(d),
   )
-  .handler(async ({ data }): Promise<{ content: unknown }> => {
+  .handler(async ({ data }): Promise<{ content: SerializablePageContent }> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("LOVABLE_API_KEY ausente");
 
@@ -434,7 +442,7 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
       } catch {
         output = await tryRawJson();
       }
-      return { content: validateGeneratedContent(fillSections(output)) };
+      return { content: serializableContent(validateGeneratedContent(fillSections(output))) };
     } catch (err: unknown) {
       throw new Error(safeGenerationError(err));
     }
