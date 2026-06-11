@@ -5,9 +5,9 @@ import { Sparkles, Zap, Layers, Palette, Globe, BarChart3, ArrowRight, Check } f
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Indigo — Construa páginas SaaS que convertem" },
+      { title: "Ranole — Construa páginas SaaS que convertem" },
       { name: "description", content: "Plataforma visual para criar landing pages, sites institucionais e funis. Multi-tenant, versionado e pronto para escalar." },
-      { property: "og:title", content: "Indigo — Construa páginas SaaS que convertem" },
+      { property: "og:title", content: "Ranole — Construa páginas SaaS que convertem" },
       { property: "og:description", content: "Builder visual com componentes Atomic Design e arquitetura enterprise." },
     ],
   }),
@@ -37,7 +37,7 @@ function SiteHeader() {
           <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary text-primary-foreground shadow-glow">
             <Sparkles className="h-4 w-4" />
           </div>
-          Indigo
+          Ranole
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <a href="#beneficios" className="hover:text-foreground">Recursos</a>
@@ -224,7 +224,7 @@ function Pricing() {
 
 const faqs = [
   { q: "Como funciona o builder?", a: "Arraste blocos prontos, edite propriedades e publique. Tudo é salvo como JSON versionado." },
-  { q: "Onde minha página é publicada?", a: "Em um subdomínio do Indigo no formato /p/seu-workspace/sua-pagina. Domínio próprio ainda não está disponível." },
+  { q: "Onde minha página é publicada?", a: "Em um subdomínio do Ranole no formato /p/seu-workspace/sua-pagina. Domínio próprio ainda não está disponível." },
   { q: "Posso usar IA para gerar conteúdo?", a: "Sim. O editor inclui geração de conteúdo com IA em todos os planos." },
   { q: "Posso exportar minha página?", a: "Em breve. A v0 foca em publicação no nosso host." },
 ];
@@ -270,7 +270,7 @@ function SiteFooter() {
   return (
     <footer className="border-t border-border py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
-        <p className="text-sm text-muted-foreground">© 2026 Indigo. Plataforma SaaS de páginas.</p>
+        <p className="text-sm text-muted-foreground">© 2026 Ranole. Plataforma SaaS de páginas.</p>
         <p className="text-sm text-muted-foreground">Feito com arquitetura enterprise.</p>
       </div>
     </footer>

@@ -29,7 +29,7 @@ function Layout() {
           <div className="flex items-center gap-6">
             <Link to="/dashboard" className="flex items-center gap-2 font-display font-semibold">
               <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-primary text-primary-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
-              Indigo
+              Ranole
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <Link to="/dashboard"

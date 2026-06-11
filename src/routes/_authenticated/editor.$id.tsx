@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/editor/$id")({
-  head: () => ({ meta: [{ title: "Editor — Indigo" }] }),
+  head: () => ({ meta: [{ title: "Editor — Ranole" }] }),
   component: Editor,
 });
 

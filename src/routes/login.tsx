@@ -7,7 +7,7 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Entrar — Indigo" }] }),
+  head: () => ({ meta: [{ title: "Entrar — Ranole" }] }),
   component: LoginPage,
 });
 
@@ -70,13 +70,13 @@ function LoginPage() {
       <div className="relative hidden md:flex flex-col justify-between bg-hero ring-grid p-10">
         <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
           <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary text-primary-foreground shadow-glow"><Sparkles className="h-4 w-4" /></div>
-          Indigo
+          Ranole
         </Link>
         <div>
           <h2 className="font-display text-4xl font-bold leading-tight">Construa, publique, converta.</h2>
           <p className="mt-3 max-w-md text-muted-foreground">Builder visual SaaS multi-tenant pronto para escalar.</p>
         </div>
-        <p className="text-xs text-muted-foreground">© 2026 Indigo</p>
+        <p className="text-xs text-muted-foreground">© 2026 Ranole</p>
       </div>
 
       <div className="flex items-center justify-center p-6">

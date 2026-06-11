@@ -75,7 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Indigo — Construtor de páginas SaaS" },
+      { title: "Ranole — Construtor de páginas SaaS" },
       { name: "description", content: "Plataforma SaaS para criar landing pages, sites e funis com builder visual." },
     ],
     links: [

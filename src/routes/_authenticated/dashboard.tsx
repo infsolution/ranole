@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { TemplateThumbnail } from "@/components/TemplateThumbnail";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Indigo" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Ranole" }] }),
   component: Dashboard,
 });
 
