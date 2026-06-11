@@ -272,6 +272,11 @@ export const trackEvent = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data }) => {
+    // Verify page is published before recording analytics (admin client bypasses RLS)
+    const { data: page } = await supabaseAdmin
+      .from("pages").select("status").eq("id", data.pageId).maybeSingle();
+    if (!page || page.status !== "published") return { ok: false };
+
     await supabaseAdmin.from("analytics_events").insert({
       page_id: data.pageId,
       event_type: data.eventType,
