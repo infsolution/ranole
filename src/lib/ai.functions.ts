@@ -20,7 +20,10 @@ const heroProps = z.object({
 const benefitsProps = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
-  items: z.array(z.object({ title: z.string(), description: z.string() })).min(1).max(8),
+  items: z
+    .array(z.object({ title: z.string(), description: z.string() }))
+    .min(1)
+    .max(8),
 });
 const ctaProps = z.object({
   title: z.string(),
@@ -34,7 +37,10 @@ const faqProps = z.object({
 });
 const testimonialsProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ name: z.string(), role: z.string(), quote: z.string() })).min(1).max(8),
+  items: z
+    .array(z.object({ name: z.string(), role: z.string(), quote: z.string() }))
+    .min(1)
+    .max(8),
 });
 const footerProps = z.object({
   copyright: z.string(),
@@ -43,21 +49,29 @@ const footerProps = z.object({
 const featuresProps = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
-  items: z.array(z.object({ title: z.string(), description: z.string() })).min(1).max(12),
+  items: z
+    .array(z.object({ title: z.string(), description: z.string() }))
+    .min(1)
+    .max(12),
 });
 const pricingProps = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
-  items: z.array(z.object({
-    name: z.string(),
-    price: z.string(),
-    period: z.string().optional(),
-    description: z.string().optional(),
-    features: z.string(),
-    ctaText: z.string().optional(),
-    ctaHref: z.string().optional(),
-    highlight: z.string().optional(),
-  })).min(1).max(4),
+  items: z
+    .array(
+      z.object({
+        name: z.string(),
+        price: z.string(),
+        period: z.string().optional(),
+        description: z.string().optional(),
+        features: z.string(),
+        ctaText: z.string().optional(),
+        ctaHref: z.string().optional(),
+        highlight: z.string().optional(),
+      }),
+    )
+    .min(1)
+    .max(4),
 });
 const logosProps = z.object({
   title: z.string().optional(),
@@ -65,7 +79,10 @@ const logosProps = z.object({
 });
 const statsProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ value: z.string(), label: z.string() })).min(1).max(8),
+  items: z
+    .array(z.object({ value: z.string(), label: z.string() }))
+    .min(1)
+    .max(8),
 });
 const contactProps = z.object({
   title: z.string(),
