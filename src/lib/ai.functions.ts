@@ -33,7 +33,10 @@ const ctaProps = z.object({
 });
 const faqProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ q: z.string(), a: z.string() })).min(1).max(10),
+  items: z
+    .array(z.object({ q: z.string(), a: z.string() }))
+    .min(1)
+    .max(10),
 });
 const testimonialsProps = z.object({
   title: z.string().optional(),
@@ -75,7 +78,10 @@ const pricingProps = z.object({
 });
 const logosProps = z.object({
   title: z.string().optional(),
-  items: z.array(z.object({ name: z.string() })).min(1).max(12),
+  items: z
+    .array(z.object({ name: z.string() }))
+    .min(1)
+    .max(12),
 });
 const statsProps = z.object({
   title: z.string().optional(),
@@ -110,14 +116,18 @@ const pageSchema = z.object({
   sections: z.array(sectionSchema).min(2).max(8),
 });
 
-const looseSectionSchema = z.object({
-  type: z.string(),
-  props: z.record(z.unknown()).optional(),
-}).passthrough();
+const looseSectionSchema = z
+  .object({
+    type: z.string(),
+    props: z.record(z.unknown()).optional(),
+  })
+  .passthrough();
 
-const loosePageSchema = z.object({
-  sections: z.array(looseSectionSchema).min(1).max(20),
-}).passthrough();
+const loosePageSchema = z
+  .object({
+    sections: z.array(looseSectionSchema).min(1).max(20),
+  })
+  .passthrough();
 
 type LooseSection = z.infer<typeof looseSectionSchema>;
 type LoosePage = z.infer<typeof loosePageSchema>;
@@ -146,7 +156,11 @@ Regras:
 function text(value: unknown, fallback: unknown = ""): string {
   const target = value === undefined || value === null ? fallback : value;
   if (target === undefined || target === null) return "";
-  if (Array.isArray(target)) return target.map((item) => text(item)).filter(Boolean).join("\n");
+  if (Array.isArray(target))
+    return target
+      .map((item) => text(item))
+      .filter(Boolean)
+      .join("\n");
   if (typeof target === "object") return "";
   return String(target);
 }
@@ -179,12 +193,18 @@ function featureLines(value: unknown, fallback: unknown = ""): string {
 
 function items(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value)
-    ? value.filter((item): item is Record<string, unknown> => !!item && typeof item === "object" && !Array.isArray(item))
+    ? value.filter(
+        (item): item is Record<string, unknown> =>
+          !!item && typeof item === "object" && !Array.isArray(item),
+      )
     : [];
 }
 
 function normalizeType(value: unknown): SectionType | null {
-  const normalized = text(value).trim().toLowerCase().replace(/[\s_-]/g, "");
+  const normalized = text(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]/g, "");
   const aliases: Record<string, SectionType> = {
     hero: "hero",
     headline: "hero",
@@ -264,7 +284,10 @@ function normalizeSection(section: LooseSection): Section | null {
             price: text(item.price || item.valor, "Sob consulta"),
             period: text(item.period || item.periodo),
             description: text(item.description || item.subtitle),
-            features: featureLines(item.features || item.recursos || item.items, defaultPricingFeatures(defaults)),
+            features: featureLines(
+              item.features || item.recursos || item.items,
+              defaultPricingFeatures(defaults),
+            ),
             ctaText: text(item.ctaText || item.cta || item.buttonText, "Comprar agora"),
             ctaHref: text(item.ctaHref || item.href || item.link, "#"),
             highlight: item.highlight === true ? "true" : text(item.highlight),
@@ -281,7 +304,10 @@ function normalizeSection(section: LooseSection): Section | null {
           .map((item) => ({ name: text(item.name || item.title || item.label) }))
           .filter((item) => item.name)
           .slice(0, 12);
-        return { title: text(props.title, defaults.title), items: normalizedItems.length ? normalizedItems : defaults.items };
+        return {
+          title: text(props.title, defaults.title),
+          items: normalizedItems.length ? normalizedItems : defaults.items,
+        };
       }
       case "stats": {
         const normalizedItems = items(props.items || props.stats || props.metrics)
@@ -291,7 +317,10 @@ function normalizeSection(section: LooseSection): Section | null {
           }))
           .filter((item) => item.value || item.label)
           .slice(0, 8);
-        return { title: text(props.title, defaults.title), items: normalizedItems.length ? normalizedItems : defaults.items };
+        return {
+          title: text(props.title, defaults.title),
+          items: normalizedItems.length ? normalizedItems : defaults.items,
+        };
       }
       case "testimonials": {
         const normalizedItems = items(props.items || props.testimonials || props.depoimentos)
@@ -302,7 +331,10 @@ function normalizeSection(section: LooseSection): Section | null {
           }))
           .filter((item) => item.quote)
           .slice(0, 8);
-        return { title: text(props.title, defaults.title), items: normalizedItems.length ? normalizedItems : defaults.items };
+        return {
+          title: text(props.title, defaults.title),
+          items: normalizedItems.length ? normalizedItems : defaults.items,
+        };
       }
       case "faq": {
         const normalizedItems = items(props.items || props.questions || props.perguntas)
@@ -312,7 +344,10 @@ function normalizeSection(section: LooseSection): Section | null {
           }))
           .filter((item) => item.q || item.a)
           .slice(0, 10);
-        return { title: text(props.title, defaults.title), items: normalizedItems.length ? normalizedItems : defaults.items };
+        return {
+          title: text(props.title, defaults.title),
+          items: normalizedItems.length ? normalizedItems : defaults.items,
+        };
       }
       case "contact":
         return {
@@ -354,16 +389,23 @@ function defaultSection(type: SectionType): Section {
 }
 
 function fillSections(raw: LoosePage): PageContent {
-  const normalized = raw.sections.map(normalizeSection).filter((section): section is Section => !!section);
+  const normalized = raw.sections
+    .map(normalizeSection)
+    .filter((section): section is Section => !!section);
   const withoutFooters = normalized.filter((section) => section.type !== "footer");
   const hero = withoutFooters.find((section) => section.type === "hero") || defaultSection("hero");
   const middle = withoutFooters.filter((section) => section.type !== "hero").slice(0, 6);
-  const footer = normalized.find((section) => section.type === "footer") || defaultSection("footer");
+  const footer =
+    normalized.find((section) => section.type === "footer") || defaultSection("footer");
   return { sections: [hero, ...middle, footer] };
 }
 
 function extractJson(raw: string): unknown {
-  const clean = raw.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+  const clean = raw
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/i, "")
+    .trim();
   const firstObject = clean.indexOf("{");
   const firstArray = clean.indexOf("[");
   const starts = [firstObject, firstArray].filter((index) => index >= 0);
@@ -379,7 +421,12 @@ function extractJson(raw: string): unknown {
     const parsedObject = parsed as Record<string, unknown>;
     if (Array.isArray(parsedObject.sections)) return parsedObject;
     const page = parsedObject.page;
-    if (page && typeof page === "object" && Array.isArray((page as Record<string, unknown>).sections)) return page;
+    if (
+      page &&
+      typeof page === "object" &&
+      Array.isArray((page as Record<string, unknown>).sections)
+    )
+      return page;
   }
   return parsed;
 }
@@ -406,9 +453,7 @@ function safeGenerationError(err: unknown) {
 
 export const generatePageFromPrompt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z.object({ prompt: z.string().min(4).max(2000) }).parse(d),
-  )
+  .inputValidator((d) => z.object({ prompt: z.string().min(4).max(2000) }).parse(d))
   .handler(async ({ data }): Promise<{ content: SerializablePageContent }> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("LOVABLE_API_KEY ausente");
@@ -429,7 +474,9 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
     const tryRawJson = async () => {
       const { text } = await generateText({
         model,
-        system: systemPrompt() + `\n\nRetorne APENAS um JSON válido, sem markdown, sem cercas \`\`\`, no formato: {"sections":[{"type":"hero","props":{...}}, ...]}.`,
+        system:
+          systemPrompt() +
+          `\n\nRetorne APENAS um JSON válido, sem markdown, sem cercas \`\`\`, no formato: {"sections":[{"type":"hero","props":{...}}, ...]}.`,
         prompt: `Brief: ${data.prompt}`,
       });
       return parseLoosePage(extractJson(text));
