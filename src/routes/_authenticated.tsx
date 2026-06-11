@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, LogOut, Sparkles, CreditCard } from "lucide-react";
+import { LayoutDashboard, LogOut, CreditCard } from "lucide-react";
+import ranoleLogo from "@/assets/ranole-logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -28,8 +29,8 @@ function Layout() {
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Link to="/dashboard" className="flex items-center gap-2 font-display font-semibold">
-              <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-primary text-primary-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
-              Indigo
+              <img src={ranoleLogo.url} alt="Ranole" className="h-7 w-7 object-contain" />
+              Ranole
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <Link to="/dashboard"

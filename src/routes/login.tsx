@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import ranoleLogo from "@/assets/ranole-logo.png.asset.json";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Entrar — Indigo" }] }),
+  head: () => ({ meta: [{ title: "Entrar — Ranole" }] }),
   component: LoginPage,
 });
 
@@ -69,14 +70,14 @@ function LoginPage() {
     <div className="min-h-screen grid md:grid-cols-2">
       <div className="relative hidden md:flex flex-col justify-between bg-hero ring-grid p-10">
         <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
-          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary text-primary-foreground shadow-glow"><Sparkles className="h-4 w-4" /></div>
-          Indigo
+          <img src={ranoleLogo.url} alt="Ranole" className="h-8 w-8 object-contain" />
+          Ranole
         </Link>
         <div>
           <h2 className="font-display text-4xl font-bold leading-tight">Construa, publique, converta.</h2>
           <p className="mt-3 max-w-md text-muted-foreground">Builder visual SaaS multi-tenant pronto para escalar.</p>
         </div>
-        <p className="text-xs text-muted-foreground">© 2026 Indigo</p>
+        <p className="text-xs text-muted-foreground">© 2026 Ranole</p>
       </div>
 
       <div className="flex items-center justify-center p-6">

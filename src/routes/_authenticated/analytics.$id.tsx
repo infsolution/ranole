@@ -15,7 +15,7 @@ import { ArrowLeft, Eye, MousePointerClick, Users, Loader2, ExternalLink } from 
 import { getPageAnalytics } from "@/lib/pages.functions";
 
 export const Route = createFileRoute("/_authenticated/analytics/$id")({
-  head: () => ({ meta: [{ title: "Analytics — Indigo" }] }),
+  head: () => ({ meta: [{ title: "Analytics — Ranole" }] }),
   component: AnalyticsPage,
 });
 
