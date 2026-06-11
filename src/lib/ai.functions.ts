@@ -134,14 +134,38 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
     const gateway = createLovableAiGatewayProvider(key);
     const model = gateway("google/gemini-3-flash-preview");
 
-    try {
+    const tryStructured = async () => {
       const { experimental_output } = await generateText({
         model,
         system: systemPrompt(),
         prompt: `Brief: ${data.prompt}`,
         experimental_output: Output.object({ schema: pageSchema }),
       });
-      return { content: fillSections(experimental_output) };
+      return experimental_output;
+    };
+
+    const tryRawJson = async () => {
+      const { text } = await generateText({
+        model,
+        system: systemPrompt() + `\n\nRetorne APENAS um JSON válido, sem markdown, sem cercas \`\`\`, no formato: {"sections":[{"type":"hero","props":{...}}, ...]}.`,
+        prompt: `Brief: ${data.prompt}`,
+      });
+      const clean = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+      const start = clean.indexOf("{");
+      const end = clean.lastIndexOf("}");
+      const slice = start >= 0 && end > start ? clean.slice(start, end + 1) : clean;
+      const parsed = JSON.parse(slice);
+      return pageSchema.parse(parsed);
+    };
+
+    try {
+      let output: z.infer<typeof pageSchema>;
+      try {
+        output = await tryStructured();
+      } catch {
+        output = await tryRawJson();
+      }
+      return { content: fillSections(output) };
     } catch (err: any) {
       const msg = err?.message || "";
       if (msg.includes("429")) throw new Error("Limite de uso de IA atingido. Tente novamente em instantes.");
