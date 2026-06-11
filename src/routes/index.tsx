@@ -35,9 +35,7 @@ function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
-          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary text-primary-foreground shadow-glow">
-            <Sparkles className="h-4 w-4" />
-          </div>
+          <img src={ranoleLogo.url} alt="Ranole" className="h-8 w-8 object-contain" />
           Ranole
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
