@@ -75,8 +75,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ranole — Construtor de páginas SaaS" },
+      { title: "Indigo — Construtor de páginas SaaS" },
       { name: "description", content: "Plataforma SaaS para criar landing pages, sites e funis com builder visual." },
+      { property: "og:title", content: "Indigo — Construtor de páginas SaaS" },
+      { name: "twitter:title", content: "Indigo — Construtor de páginas SaaS" },
+      { property: "og:description", content: "Plataforma SaaS para criar landing pages, sites e funis com builder visual." },
+      { name: "twitter:description", content: "Plataforma SaaS para criar landing pages, sites e funis com builder visual." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1f6GH45z5MUuM61qY39TYhc4HrI3/social-images/social-1781187533387-ranole-logo.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1f6GH45z5MUuM61qY39TYhc4HrI3/social-images/social-1781187533387-ranole-logo.webp" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
