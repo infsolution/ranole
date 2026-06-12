@@ -369,6 +369,8 @@ function normalizeSection(section: LooseSection): Section | null {
           copyright: text(props.copyright, defaults.copyright),
           tagline: text(props.tagline || props.subtitle, defaults.tagline),
         };
+      default:
+        return { ...defaults, ...props };
     }
   })();
 
