@@ -11,8 +11,26 @@ import {
   BarChart3,
   Mail,
   Check,
+  ArrowRight,
+  Megaphone,
 } from "lucide-react";
 import type { SectionType } from "./types";
+
+/* ============== Tiny sanitizer: allow only <a href="..."> tags ============== */
+function sanitizeRichText(input: string): string {
+  if (!input) return "";
+  // Escape everything first
+  const escaped = input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+  // Restore <a href="..."> and </a>
+  return escaped.replace(
+    /&lt;a\s+href=&quot;(https?:\/\/[^&"\s]+|\/[^&"\s]*|mailto:[^&"\s]+|tel:[^&"\s]+)&quot;(?:\s+target=&quot;_blank&quot;)?&gt;/gi,
+    (_m, href) => `<a href="${href}" target="_blank" rel="noopener noreferrer" class="underline">`,
+  ).replace(/&lt;\/a&gt;/gi, "</a>");
+}
 
 /* ============== Color helper ============== */
 
@@ -280,12 +298,61 @@ function Footer(p: any) {
   );
 }
 
+function BannerCta(p: any) {
+  const bg = p.colors?.bg || "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)/0.7) 100%)";
+  const text = p.colors?.text || "#ffffff";
+  const radius = p.borderRadius || "1rem";
+  const shadow = p.shadow || "0 20px 60px -20px rgba(0,0,0,0.35)";
+  const padding = p.padding || "1.25rem";
+  const showArrow = p.showArrow !== false && String(p.showArrow) !== "false";
+  const href = p.ctaHref || "#";
+  return (
+    <section className="bg-background py-8" style={{ color: text }}>
+      <div className="mx-auto max-w-6xl px-6">
+        <a
+          href={href}
+          target={p.openInNewTab ? "_blank" : undefined}
+          rel={p.openInNewTab ? "noopener noreferrer" : undefined}
+          className="group flex w-full items-center gap-4 transition hover:opacity-95"
+          style={{
+            background: bg,
+            color: text,
+            borderRadius: radius,
+            boxShadow: shadow,
+            padding,
+          }}
+        >
+          {p.imageUrl && (
+            <img
+              src={p.imageUrl}
+              alt={p.imageAlt || ""}
+              className="aspect-square h-20 w-20 shrink-0 rounded-[inherit] object-cover md:h-24 md:w-24"
+              style={{ borderRadius: `calc(${radius} - 0.25rem)` }}
+            />
+          )}
+          <div className="min-w-0 flex-1 text-sm md:text-base">
+            {p.title && <div className="mb-1 text-base font-semibold md:text-lg">{p.title}</div>}
+            <div
+              className="leading-snug opacity-95 [&_a]:font-semibold [&_a]:underline"
+              dangerouslySetInnerHTML={{ __html: sanitizeRichText(p.description || "") }}
+            />
+          </div>
+          {showArrow && (
+            <ArrowRight className="h-6 w-6 shrink-0 transition group-hover:translate-x-1" />
+          )}
+        </a>
+      </div>
+    </section>
+  );
+}
+
 /* ============== Registry ============== */
 
 export interface BlockSchemaField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "items";
+  type: "text" | "textarea" | "items" | "image" | "toggle" | "richtext";
+  placeholder?: string;
   itemFields?: Array<{ key: string; label: string; type: "text" | "textarea" }>;
 }
 
@@ -567,6 +634,37 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
     schema: [
       { key: "copyright", label: "Copyright", type: "text" },
       { key: "tagline", label: "Tagline", type: "text" },
+    ],
+  },
+  bannerCta: {
+    type: "bannerCta",
+    label: "Banner CTA",
+    icon: Megaphone,
+    Component: BannerCta,
+    defaultProps: {
+      title: "Oferta especial",
+      description: 'Aproveite nossa promoção. <a href="https://exemplo.com">Saiba mais</a>',
+      imageUrl: "",
+      imageAlt: "",
+      ctaHref: "#",
+      showArrow: true,
+      openInNewTab: false,
+      borderRadius: "1rem",
+      shadow: "0 20px 60px -20px rgba(0,0,0,0.35)",
+      padding: "1.25rem",
+      colors: { bg: "", text: "#ffffff" },
+    },
+    schema: [
+      { key: "title", label: "Título", type: "text" },
+      { key: "description", label: "Descrição (HTML <a> permitido)", type: "richtext" },
+      { key: "imageUrl", label: "Imagem (lado esquerdo)", type: "image" },
+      { key: "imageAlt", label: "Texto alternativo da imagem", type: "text" },
+      { key: "ctaHref", label: "Link do banner inteiro", type: "text", placeholder: "https://..." },
+      { key: "showArrow", label: "Mostrar seta CTA", type: "toggle" },
+      { key: "openInNewTab", label: "Abrir em nova aba", type: "toggle" },
+      { key: "borderRadius", label: "Border radius (ex: 1rem)", type: "text", placeholder: "1rem" },
+      { key: "shadow", label: "Sombra (box-shadow CSS)", type: "text", placeholder: "0 20px 60px -20px rgba(0,0,0,0.35)" },
+      { key: "padding", label: "Padding interno", type: "text", placeholder: "1.25rem" },
     ],
   },
 };

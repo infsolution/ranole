@@ -254,7 +254,7 @@ function Editor() {
           </div>
           {rightTab === "block" ? (
             selected ? (
-              <PropertiesPanel section={selected} onPatch={(p) => patchProps(selected.id, p)} />
+              <PropertiesPanel section={selected} workspaceId={(page as any).workspace_id} onPatch={(p) => patchProps(selected.id, p)} />
             ) : (
               <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
             )
@@ -329,7 +329,7 @@ function SortableRow({ section, selected, onSelect, onMoveUp, onMoveDown, onDele
   );
 }
 
-function PropertiesPanel({ section, onPatch }: { section: Section; onPatch: (p: Record<string, unknown>) => void }) {
+function PropertiesPanel({ section, workspaceId, onPatch }: { section: Section; workspaceId?: string; onPatch: (p: Record<string, unknown>) => void }) {
   const def = blockRegistry[section.type];
   const p: any = section.props;
   const colors: any = p.colors || {};
@@ -383,14 +383,41 @@ function PropertiesPanel({ section, onPatch }: { section: Section; onPatch: (p: 
         if (field.type === "text") {
           return (
             <Field key={field.key} label={field.label}>
-              <Input value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
+              <Input placeholder={field.placeholder} value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
             </Field>
           );
         }
-        if (field.type === "textarea") {
+        if (field.type === "textarea" || field.type === "richtext") {
           return (
             <Field key={field.key} label={field.label}>
-              <Textarea rows={3} value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
+              <Textarea rows={field.type === "richtext" ? 4 : 3} placeholder={field.placeholder} value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
+              {field.type === "richtext" && (
+                <p className="text-[10px] text-muted-foreground">
+                  Use &lt;a href="https://..."&gt;texto&lt;/a&gt; para criar links.
+                </p>
+              )}
+            </Field>
+          );
+        }
+        if (field.type === "toggle") {
+          const checked = p[field.key] !== false && String(p[field.key]) !== "false";
+          return (
+            <Field key={field.key} label={field.label}>
+              <label className="inline-flex cursor-pointer items-center gap-2 text-xs">
+                <input type="checkbox" checked={checked} onChange={(e) => onPatch({ [field.key]: e.target.checked })} />
+                <span className="text-muted-foreground">{checked ? "Ativado" : "Desativado"}</span>
+              </label>
+            </Field>
+          );
+        }
+        if (field.type === "image") {
+          return (
+            <Field key={field.key} label={field.label}>
+              <ImageUploadField
+                value={p[field.key] as string}
+                workspaceId={workspaceId}
+                onChange={(url) => onPatch({ [field.key]: url })}
+              />
             </Field>
           );
         }
@@ -462,6 +489,52 @@ function SeoPanel({ seo, onChange }: { seo: { title: string; description: string
       <Field label="Imagem OG (URL)">
         <Input value={seo.ogImage} onChange={e => onChange({ ...seo, ogImage: e.target.value })} placeholder="https://meusite.com/imagem.jpg" />
       </Field>
+    </div>
+  );
+}
+
+function ImageUploadField({ value, workspaceId, onChange }: { value?: string; workspaceId?: string; onChange: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  async function handleFile(file: File) {
+    if (!workspaceId) { toast.error("Workspace indisponível"); return; }
+    setBusy(true);
+    try {
+      const { uploadImage } = await import("@/lib/upload-image");
+      const url = await uploadImage(file, workspaceId);
+      onChange(url);
+      toast.success("Imagem enviada");
+    } catch (e: any) {
+      toast.error(e.message || "Falha no upload");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="space-y-2">
+      {value && (
+        <div className="relative inline-block">
+          <img src={value} alt="" className="h-20 w-20 rounded-md border border-border object-cover" />
+          <button onClick={() => onChange("")} type="button"
+            className="absolute -right-1 -top-1 rounded-full bg-destructive px-1.5 text-[10px] text-destructive-foreground">×</button>
+        </div>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
+      />
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={busy}
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs hover:bg-surface-elevated disabled:opacity-60">
+          {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+          {busy ? "Enviando..." : value ? "Substituir" : "Enviar imagem"}
+        </button>
+        <span className="text-[10px] text-muted-foreground">Máx 5MB · otimizada para WebP</span>
+      </div>
+      <Input value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder="ou cole uma URL" className="h-8 text-xs" />
     </div>
   );
 }

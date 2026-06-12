@@ -9,6 +9,7 @@ export type SectionType =
   | "faq"
   | "contact"
   | "cta"
+  | "bannerCta"
   | "footer";
 
 export interface Section {
