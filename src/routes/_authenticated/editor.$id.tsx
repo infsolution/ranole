@@ -254,7 +254,7 @@ function Editor() {
           </div>
           {rightTab === "block" ? (
             selected ? (
-              <PropertiesPanel section={selected} onPatch={(p) => patchProps(selected.id, p)} />
+              <PropertiesPanel section={selected} workspaceId={(page as any).workspace_id} onPatch={(p) => patchProps(selected.id, p)} />
             ) : (
               <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
             )
@@ -329,7 +329,7 @@ function SortableRow({ section, selected, onSelect, onMoveUp, onMoveDown, onDele
   );
 }
 
-function PropertiesPanel({ section, onPatch }: { section: Section; onPatch: (p: Record<string, unknown>) => void }) {
+function PropertiesPanel({ section, workspaceId, onPatch }: { section: Section; workspaceId?: string; onPatch: (p: Record<string, unknown>) => void }) {
   const def = blockRegistry[section.type];
   const p: any = section.props;
   const colors: any = p.colors || {};
@@ -383,14 +383,41 @@ function PropertiesPanel({ section, onPatch }: { section: Section; onPatch: (p: 
         if (field.type === "text") {
           return (
             <Field key={field.key} label={field.label}>
-              <Input value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
+              <Input placeholder={field.placeholder} value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
             </Field>
           );
         }
-        if (field.type === "textarea") {
+        if (field.type === "textarea" || field.type === "richtext") {
           return (
             <Field key={field.key} label={field.label}>
-              <Textarea rows={3} value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
+              <Textarea rows={field.type === "richtext" ? 4 : 3} placeholder={field.placeholder} value={p[field.key] ?? ""} onChange={e => onPatch({ [field.key]: e.target.value })} />
+              {field.type === "richtext" && (
+                <p className="text-[10px] text-muted-foreground">
+                  Use &lt;a href="https://..."&gt;texto&lt;/a&gt; para criar links.
+                </p>
+              )}
+            </Field>
+          );
+        }
+        if (field.type === "toggle") {
+          const checked = p[field.key] !== false && String(p[field.key]) !== "false";
+          return (
+            <Field key={field.key} label={field.label}>
+              <label className="inline-flex cursor-pointer items-center gap-2 text-xs">
+                <input type="checkbox" checked={checked} onChange={(e) => onPatch({ [field.key]: e.target.checked })} />
+                <span className="text-muted-foreground">{checked ? "Ativado" : "Desativado"}</span>
+              </label>
+            </Field>
+          );
+        }
+        if (field.type === "image") {
+          return (
+            <Field key={field.key} label={field.label}>
+              <ImageUploadField
+                value={p[field.key] as string}
+                workspaceId={workspaceId}
+                onChange={(url) => onPatch({ [field.key]: url })}
+              />
             </Field>
           );
         }
