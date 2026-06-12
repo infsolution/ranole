@@ -492,3 +492,49 @@ function SeoPanel({ seo, onChange }: { seo: { title: string; description: string
     </div>
   );
 }
+
+function ImageUploadField({ value, workspaceId, onChange }: { value?: string; workspaceId?: string; onChange: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  async function handleFile(file: File) {
+    if (!workspaceId) { toast.error("Workspace indisponível"); return; }
+    setBusy(true);
+    try {
+      const { uploadImage } = await import("@/lib/upload-image");
+      const url = await uploadImage(file, workspaceId);
+      onChange(url);
+      toast.success("Imagem enviada");
+    } catch (e: any) {
+      toast.error(e.message || "Falha no upload");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="space-y-2">
+      {value && (
+        <div className="relative inline-block">
+          <img src={value} alt="" className="h-20 w-20 rounded-md border border-border object-cover" />
+          <button onClick={() => onChange("")} type="button"
+            className="absolute -right-1 -top-1 rounded-full bg-destructive px-1.5 text-[10px] text-destructive-foreground">×</button>
+        </div>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
+      />
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={busy}
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs hover:bg-surface-elevated disabled:opacity-60">
+          {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+          {busy ? "Enviando..." : value ? "Substituir" : "Enviar imagem"}
+        </button>
+        <span className="text-[10px] text-muted-foreground">Máx 5MB · otimizada para WebP</span>
+      </div>
+      <Input value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder="ou cole uma URL" className="h-8 text-xs" />
+    </div>
+  );
+}
