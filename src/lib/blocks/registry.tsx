@@ -287,14 +287,51 @@ function Contact(p: any) {
   );
 }
 
-function Footer(p: any) {
+function BannerCta(p: any) {
+  const bg = p.colors?.bg || "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)/0.7) 100%)";
+  const text = p.colors?.text || "#ffffff";
+  const radius = p.borderRadius || "1rem";
+  const shadow = p.shadow || "0 20px 60px -20px rgba(0,0,0,0.35)";
+  const padding = p.padding || "1.25rem";
+  const showArrow = p.showArrow !== false && String(p.showArrow) !== "false";
+  const href = p.ctaHref || "#";
   return (
-    <footer className="border-t border-border bg-surface py-10" style={sectionStyle(p)}>
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
-        <p className="text-sm text-muted-foreground">{p.copyright}</p>
-        <p className="text-sm text-muted-foreground">{p.tagline}</p>
+    <section className="bg-background py-8" style={{ color: text }}>
+      <div className="mx-auto max-w-6xl px-6">
+        <a
+          href={href}
+          target={p.openInNewTab ? "_blank" : undefined}
+          rel={p.openInNewTab ? "noopener noreferrer" : undefined}
+          className="group flex w-full items-center gap-4 transition hover:opacity-95"
+          style={{
+            background: bg,
+            color: text,
+            borderRadius: radius,
+            boxShadow: shadow,
+            padding,
+          }}
+        >
+          {p.imageUrl && (
+            <img
+              src={p.imageUrl}
+              alt={p.imageAlt || ""}
+              className="aspect-square h-20 w-20 shrink-0 rounded-[inherit] object-cover md:h-24 md:w-24"
+              style={{ borderRadius: `calc(${radius} - 0.25rem)` }}
+            />
+          )}
+          <div className="min-w-0 flex-1 text-sm md:text-base">
+            {p.title && <div className="mb-1 text-base font-semibold md:text-lg">{p.title}</div>}
+            <div
+              className="leading-snug opacity-95 [&_a]:font-semibold [&_a]:underline"
+              dangerouslySetInnerHTML={{ __html: sanitizeRichText(p.description || "") }}
+            />
+          </div>
+          {showArrow && (
+            <ArrowRight className="h-6 w-6 shrink-0 transition group-hover:translate-x-1" />
+          )}
+        </a>
       </div>
-    </footer>
+    </section>
   );
 }
 
@@ -303,7 +340,8 @@ function Footer(p: any) {
 export interface BlockSchemaField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "items";
+  type: "text" | "textarea" | "items" | "image" | "toggle" | "richtext";
+  placeholder?: string;
   itemFields?: Array<{ key: string; label: string; type: "text" | "textarea" }>;
 }
 
