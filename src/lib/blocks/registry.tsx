@@ -11,8 +11,26 @@ import {
   BarChart3,
   Mail,
   Check,
+  ArrowRight,
+  Megaphone,
 } from "lucide-react";
 import type { SectionType } from "./types";
+
+/* ============== Tiny sanitizer: allow only <a href="..."> tags ============== */
+function sanitizeRichText(input: string): string {
+  if (!input) return "";
+  // Escape everything first
+  const escaped = input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+  // Restore <a href="..."> and </a>
+  return escaped.replace(
+    /&lt;a\s+href=&quot;(https?:\/\/[^&"\s]+|\/[^&"\s]*|mailto:[^&"\s]+|tel:[^&"\s]+)&quot;(?:\s+target=&quot;_blank&quot;)?&gt;/gi,
+    (_m, href) => `<a href="${href}" target="_blank" rel="noopener noreferrer" class="underline">`,
+  ).replace(/&lt;\/a&gt;/gi, "</a>");
+}
 
 /* ============== Color helper ============== */
 
