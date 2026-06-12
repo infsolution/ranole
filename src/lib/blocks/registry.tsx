@@ -287,6 +287,17 @@ function Contact(p: any) {
   );
 }
 
+function Footer(p: any) {
+  return (
+    <footer className="border-t border-border bg-surface py-10" style={sectionStyle(p)}>
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
+        <p className="text-sm text-muted-foreground">{p.copyright}</p>
+        <p className="text-sm text-muted-foreground">{p.tagline}</p>
+      </div>
+    </footer>
+  );
+}
+
 function BannerCta(p: any) {
   const bg = p.colors?.bg || "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)/0.7) 100%)";
   const text = p.colors?.text || "#ffffff";
@@ -623,6 +634,37 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
     schema: [
       { key: "copyright", label: "Copyright", type: "text" },
       { key: "tagline", label: "Tagline", type: "text" },
+    ],
+  },
+  bannerCta: {
+    type: "bannerCta",
+    label: "Banner CTA",
+    icon: Megaphone,
+    Component: BannerCta,
+    defaultProps: {
+      title: "Oferta especial",
+      description: 'Aproveite nossa promoção. <a href="https://exemplo.com">Saiba mais</a>',
+      imageUrl: "",
+      imageAlt: "",
+      ctaHref: "#",
+      showArrow: true,
+      openInNewTab: false,
+      borderRadius: "1rem",
+      shadow: "0 20px 60px -20px rgba(0,0,0,0.35)",
+      padding: "1.25rem",
+      colors: { bg: "", text: "#ffffff" },
+    },
+    schema: [
+      { key: "title", label: "Título", type: "text" },
+      { key: "description", label: "Descrição (HTML <a> permitido)", type: "richtext" },
+      { key: "imageUrl", label: "Imagem (lado esquerdo)", type: "image" },
+      { key: "imageAlt", label: "Texto alternativo da imagem", type: "text" },
+      { key: "ctaHref", label: "Link do banner inteiro", type: "text", placeholder: "https://..." },
+      { key: "showArrow", label: "Mostrar seta CTA", type: "toggle" },
+      { key: "openInNewTab", label: "Abrir em nova aba", type: "toggle" },
+      { key: "borderRadius", label: "Border radius (ex: 1rem)", type: "text", placeholder: "1rem" },
+      { key: "shadow", label: "Sombra (box-shadow CSS)", type: "text", placeholder: "0 20px 60px -20px rgba(0,0,0,0.35)" },
+      { key: "padding", label: "Padding interno", type: "text", placeholder: "1.25rem" },
     ],
   },
 };
