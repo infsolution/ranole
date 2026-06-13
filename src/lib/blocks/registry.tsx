@@ -332,10 +332,7 @@ function BannerCta(p: any) {
           )}
           <div className="min-w-0 flex-1 text-sm md:text-base">
             {p.title && <div className="mb-1 text-base font-semibold md:text-lg">{p.title}</div>}
-            <div
-              className="leading-snug opacity-95 [&_a]:font-semibold [&_a]:underline"
-              dangerouslySetInnerHTML={{ __html: sanitizeRichText(p.description || "") }}
-            />
+            <p className="leading-snug opacity-95">{p.description}</p>
           </div>
           {showArrow && (
             <ArrowRight className="h-6 w-6 shrink-0 transition group-hover:translate-x-1" />
@@ -643,7 +640,7 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
     Component: BannerCta,
     defaultProps: {
       title: "Oferta especial",
-      description: 'Aproveite nossa promoção. <a href="https://exemplo.com">Saiba mais</a>',
+      description: "Aproveite nossa promoção imperdível. Clique e confira!",
       imageUrl: "",
       imageAlt: "",
       ctaHref: "#",
@@ -656,10 +653,10 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
     },
     schema: [
       { key: "title", label: "Título", type: "text" },
-      { key: "description", label: "Descrição (HTML <a> permitido)", type: "richtext" },
+      { key: "description", label: "Descrição", type: "textarea" },
+      { key: "ctaHref", label: "URL do link", type: "text", placeholder: "https://..." },
       { key: "imageUrl", label: "Imagem (lado esquerdo)", type: "image" },
       { key: "imageAlt", label: "Texto alternativo da imagem", type: "text" },
-      { key: "ctaHref", label: "Link do banner inteiro", type: "text", placeholder: "https://..." },
       { key: "showArrow", label: "Mostrar seta CTA", type: "toggle" },
       { key: "openInNewTab", label: "Abrir em nova aba", type: "toggle" },
       { key: "borderRadius", label: "Border radius (ex: 1rem)", type: "text", placeholder: "1rem" },
