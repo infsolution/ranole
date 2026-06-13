@@ -421,6 +421,90 @@ function PropertiesPanel({ section, workspaceId, onPatch }: { section: Section; 
             </Field>
           );
         }
+        if (field.type === "range") {
+          const min = field.min ?? 0;
+          const max = field.max ?? 100;
+          const step = field.step ?? 1;
+          const unit = field.unit ?? "";
+          const raw = p[field.key];
+          const val = typeof raw === "number" ? raw : Number(raw) || 0;
+          return (
+            <Field key={field.key} label={field.label}>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={min}
+                  max={max}
+                  step={step}
+                  value={val}
+                  onChange={(e) => onPatch({ [field.key]: Number(e.target.value) })}
+                  className="flex-1 accent-primary"
+                />
+                <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">{val}{unit}</span>
+              </div>
+            </Field>
+          );
+        }
+        if (field.type === "shadow") {
+          const s = (p[field.key] && typeof p[field.key] === "object") ? p[field.key] as any : { x: 0, y: 20, blur: 60, spread: -20, color: "rgba(0,0,0,0.35)" };
+          const update = (patch: any) => onPatch({ [field.key]: { ...s, ...patch } });
+          const palette = [
+            "rgba(0,0,0,0.35)",
+            "rgba(0,0,0,0.6)",
+            "rgba(15,23,42,0.4)",
+            "rgba(59,130,246,0.4)",
+            "rgba(168,85,247,0.4)",
+            "rgba(236,72,153,0.4)",
+            "rgba(34,197,94,0.4)",
+            "rgba(234,179,8,0.45)",
+          ];
+          const sides: Array<{ k: "x" | "y" | "blur" | "spread"; label: string; min: number; max: number }> = [
+            { k: "x", label: "Horizontal (X)", min: -60, max: 60 },
+            { k: "y", label: "Vertical (Y)", min: -60, max: 60 },
+            { k: "blur", label: "Desfoque", min: 0, max: 120 },
+            { k: "spread", label: "Espalhamento", min: -60, max: 60 },
+          ];
+          return (
+            <Field key={field.key} label={field.label}>
+              <div className="space-y-2 rounded-md border border-border bg-background p-2">
+                {sides.map(({ k, label, min, max }) => {
+                  const v = Number(s[k] ?? 0);
+                  return (
+                    <div key={k}>
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                        <span>{label}</span><span className="tabular-nums">{v}px</span>
+                      </div>
+                      <input type="range" min={min} max={max} step={1} value={v}
+                        onChange={(e) => update({ [k]: Number(e.target.value) })}
+                        className="w-full accent-primary" />
+                    </div>
+                  );
+                })}
+                <div>
+                  <div className="mb-1 text-[10px] text-muted-foreground">Cor da sombra</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {palette.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => update({ color: c })}
+                        title={c}
+                        className={`h-6 w-6 rounded-md border ${s.color === c ? "border-primary ring-1 ring-primary" : "border-border"}`}
+                        style={{ background: c }}
+                      />
+                    ))}
+                  </div>
+                  <Input
+                    className="mt-1.5 h-7 text-xs"
+                    value={s.color ?? ""}
+                    placeholder="rgba(0,0,0,0.35)"
+                    onChange={(e) => update({ color: e.target.value })}
+                  />
+                </div>
+              </div>
+            </Field>
+          );
+        }
         // items
         const items: any[] = p[field.key] || [];
         return (
