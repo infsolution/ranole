@@ -298,12 +298,32 @@ function Footer(p: any) {
   );
 }
 
+function toPx(v: any, fallback: number): string {
+  if (v === 0 || v === "0") return "0px";
+  if (typeof v === "number") return `${v}px`;
+  if (typeof v === "string" && v.trim() !== "") {
+    return /^-?\d+(\.\d+)?$/.test(v.trim()) ? `${v}px` : v;
+  }
+  return `${fallback}px`;
+}
+
+function shadowToCss(s: any): string {
+  if (!s) return "0 20px 60px -20px rgba(0,0,0,0.35)";
+  if (typeof s === "string") return s;
+  const x = Number(s.x ?? 0);
+  const y = Number(s.y ?? 20);
+  const blur = Number(s.blur ?? 60);
+  const spread = Number(s.spread ?? -20);
+  const color = s.color || "rgba(0,0,0,0.35)";
+  return `${x}px ${y}px ${blur}px ${spread}px ${color}`;
+}
+
 function BannerCta(p: any) {
   const bg = p.colors?.bg || "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)/0.7) 100%)";
   const text = p.colors?.text || "#ffffff";
-  const radius = p.borderRadius || "1rem";
-  const shadow = p.shadow || "0 20px 60px -20px rgba(0,0,0,0.35)";
-  const padding = p.padding || "1.25rem";
+  const radius = toPx(p.borderRadius, 16);
+  const shadow = shadowToCss(p.shadow);
+  const padding = toPx(p.padding, 20);
   const showArrow = p.showArrow !== false && String(p.showArrow) !== "false";
   const href = p.ctaHref || "#";
   return (
@@ -327,7 +347,7 @@ function BannerCta(p: any) {
               src={p.imageUrl}
               alt={p.imageAlt || ""}
               className="aspect-square h-20 w-20 shrink-0 rounded-[inherit] object-cover md:h-24 md:w-24"
-              style={{ borderRadius: `calc(${radius} - 0.25rem)` }}
+              style={{ borderRadius: `calc(${radius} - 4px)` }}
             />
           )}
           <div className="min-w-0 flex-1 text-sm md:text-base">
@@ -348,8 +368,12 @@ function BannerCta(p: any) {
 export interface BlockSchemaField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "items" | "image" | "toggle" | "richtext";
+  type: "text" | "textarea" | "items" | "image" | "toggle" | "richtext" | "range" | "shadow";
   placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
   itemFields?: Array<{ key: string; label: string; type: "text" | "textarea" }>;
 }
 
@@ -646,9 +670,9 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
       ctaHref: "#",
       showArrow: true,
       openInNewTab: false,
-      borderRadius: "1rem",
-      shadow: "0 20px 60px -20px rgba(0,0,0,0.35)",
-      padding: "1.25rem",
+      borderRadius: 16,
+      shadow: { x: 0, y: 20, blur: 60, spread: -20, color: "rgba(0,0,0,0.35)" },
+      padding: 20,
       colors: { bg: "", text: "#ffffff" },
     },
     schema: [
@@ -659,9 +683,9 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
       { key: "imageAlt", label: "Texto alternativo da imagem", type: "text" },
       { key: "showArrow", label: "Mostrar seta CTA", type: "toggle" },
       { key: "openInNewTab", label: "Abrir em nova aba", type: "toggle" },
-      { key: "borderRadius", label: "Border radius (ex: 1rem)", type: "text", placeholder: "1rem" },
-      { key: "shadow", label: "Sombra (box-shadow CSS)", type: "text", placeholder: "0 20px 60px -20px rgba(0,0,0,0.35)" },
-      { key: "padding", label: "Padding interno", type: "text", placeholder: "1.25rem" },
+      { key: "borderRadius", label: "Border radius", type: "range", min: 0, max: 64, step: 1, unit: "px" },
+      { key: "padding", label: "Padding interno", type: "range", min: 0, max: 64, step: 1, unit: "px" },
+      { key: "shadow", label: "Sombra", type: "shadow" },
     ],
   },
 };
