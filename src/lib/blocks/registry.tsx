@@ -298,12 +298,32 @@ function Footer(p: any) {
   );
 }
 
+function toPx(v: any, fallback: number): string {
+  if (v === 0 || v === "0") return "0px";
+  if (typeof v === "number") return `${v}px`;
+  if (typeof v === "string" && v.trim() !== "") {
+    return /^-?\d+(\.\d+)?$/.test(v.trim()) ? `${v}px` : v;
+  }
+  return `${fallback}px`;
+}
+
+function shadowToCss(s: any): string {
+  if (!s) return "0 20px 60px -20px rgba(0,0,0,0.35)";
+  if (typeof s === "string") return s;
+  const x = Number(s.x ?? 0);
+  const y = Number(s.y ?? 20);
+  const blur = Number(s.blur ?? 60);
+  const spread = Number(s.spread ?? -20);
+  const color = s.color || "rgba(0,0,0,0.35)";
+  return `${x}px ${y}px ${blur}px ${spread}px ${color}`;
+}
+
 function BannerCta(p: any) {
   const bg = p.colors?.bg || "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)/0.7) 100%)";
   const text = p.colors?.text || "#ffffff";
-  const radius = p.borderRadius || "1rem";
-  const shadow = p.shadow || "0 20px 60px -20px rgba(0,0,0,0.35)";
-  const padding = p.padding || "1.25rem";
+  const radius = toPx(p.borderRadius, 16);
+  const shadow = shadowToCss(p.shadow);
+  const padding = toPx(p.padding, 20);
   const showArrow = p.showArrow !== false && String(p.showArrow) !== "false";
   const href = p.ctaHref || "#";
   return (
@@ -327,7 +347,7 @@ function BannerCta(p: any) {
               src={p.imageUrl}
               alt={p.imageAlt || ""}
               className="aspect-square h-20 w-20 shrink-0 rounded-[inherit] object-cover md:h-24 md:w-24"
-              style={{ borderRadius: `calc(${radius} - 0.25rem)` }}
+              style={{ borderRadius: `calc(${radius} - 4px)` }}
             />
           )}
           <div className="min-w-0 flex-1 text-sm md:text-base">
