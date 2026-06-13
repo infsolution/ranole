@@ -368,8 +368,12 @@ function BannerCta(p: any) {
 export interface BlockSchemaField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "items" | "image" | "toggle" | "richtext";
+  type: "text" | "textarea" | "items" | "image" | "toggle" | "richtext" | "range" | "shadow";
   placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
   itemFields?: Array<{ key: string; label: string; type: "text" | "textarea" }>;
 }
 
