@@ -332,10 +332,7 @@ function BannerCta(p: any) {
           )}
           <div className="min-w-0 flex-1 text-sm md:text-base">
             {p.title && <div className="mb-1 text-base font-semibold md:text-lg">{p.title}</div>}
-            <div
-              className="leading-snug opacity-95 [&_a]:font-semibold [&_a]:underline"
-              dangerouslySetInnerHTML={{ __html: sanitizeRichText(p.description || "") }}
-            />
+            <p className="leading-snug opacity-95">{p.description}</p>
           </div>
           {showArrow && (
             <ArrowRight className="h-6 w-6 shrink-0 transition group-hover:translate-x-1" />
