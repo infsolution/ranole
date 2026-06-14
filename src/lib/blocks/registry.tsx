@@ -55,9 +55,8 @@ export function sectionStyle(p: any): React.CSSProperties {
 
 function Hero(p: any) {
   const hasBg = !!p.backgroundImage;
-  const overlayOpacity = typeof p.backgroundOverlay === "number"
-    ? Math.max(0, Math.min(1, p.backgroundOverlay))
-    : 0.5;
+  const rawOverlay = typeof p.backgroundOverlay === "number" ? p.backgroundOverlay : 50;
+  const overlayOpacity = Math.max(0, Math.min(1, rawOverlay > 1 ? rawOverlay / 100 : rawOverlay));
   const baseStyle = sectionStyle(p);
   const bgStyle: React.CSSProperties = hasBg
     ? {
