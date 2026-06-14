@@ -271,6 +271,9 @@ export const duplicatePage = createServerFn({ method: "POST" })
       .eq("id", data.id).single();
     if (error) throw new Error(error.message);
 
+    await assertPageQuota(src.workspace_id);
+
+
     const baseSlug = slugify(`${src.name}-copia`);
     let slug = baseSlug;
     for (let i = 1; i < 50; i++) {
