@@ -18,6 +18,52 @@ function starterContent(): PageContent {
   };
 }
 
+const PLAN_PAGE_LIMITS: Record<string, number> = {
+  free: 1,
+  pro: 10,
+  business: 100,
+};
+
+async function getWorkspacePageLimit(workspaceId: string): Promise<{ plan: string; limit: number }> {
+  const { data: sub } = await supabaseAdmin
+    .from("workspace_subscriptions")
+    .select("plan, status")
+    .eq("workspace_id", workspaceId)
+    .maybeSingle();
+  const isActive = sub && ["active", "trialing"].includes(sub.status as string);
+  const plan = (isActive ? (sub?.plan as string) : "free") || "free";
+  const limit = PLAN_PAGE_LIMITS[plan] ?? PLAN_PAGE_LIMITS.free;
+  return { plan, limit };
+}
+
+async function assertPageQuota(workspaceId: string) {
+  const { plan, limit } = await getWorkspacePageLimit(workspaceId);
+  const { count } = await supabaseAdmin
+    .from("pages")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId);
+  if ((count ?? 0) >= limit) {
+    throw new Error(
+      `Limite do plano ${plan.toUpperCase()} atingido (${limit} ${limit === 1 ? "página" : "páginas"}). Faça upgrade para criar mais.`,
+    );
+  }
+}
+
+async function assertPublishQuota(workspaceId: string, pageId: string) {
+  const { plan, limit } = await getWorkspacePageLimit(workspaceId);
+  const { count } = await supabaseAdmin
+    .from("pages")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId)
+    .eq("status", "published")
+    .neq("id", pageId);
+  if ((count ?? 0) >= limit) {
+    throw new Error(
+      `Limite do plano ${plan.toUpperCase()} atingido (${limit} ${limit === 1 ? "página publicada" : "páginas publicadas"}). Faça upgrade para publicar mais.`,
+    );
+  }
+}
+
 function slugify(s: string) {
   return s
     .toLowerCase()
@@ -65,6 +111,9 @@ export const createPage = createServerFn({ method: "POST" })
     const { data: ws } = await supabase
       .from("workspaces").select("id").eq("owner_id", userId).limit(1).maybeSingle();
     if (!ws) throw new Error("Workspace não encontrado");
+
+    await assertPageQuota(ws.id);
+
 
     const baseSlug = slugify(data.name);
     let slug = baseSlug;
@@ -184,6 +233,12 @@ export const publishPage = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ id: z.string().uuid(), publish: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    if (data.publish) {
+      const { data: pg, error: pErr } = await supabase
+        .from("pages").select("workspace_id").eq("id", data.id).single();
+      if (pErr) throw new Error(pErr.message);
+      await assertPublishQuota(pg.workspace_id, data.id);
+    }
     const { error } = await supabase
       .from("pages")
       .update({
@@ -215,6 +270,9 @@ export const duplicatePage = createServerFn({ method: "POST" })
       .select("workspace_id, name, content, theme")
       .eq("id", data.id).single();
     if (error) throw new Error(error.message);
+
+    await assertPageQuota(src.workspace_id);
+
 
     const baseSlug = slugify(`${src.name}-copia`);
     let slug = baseSlug;
