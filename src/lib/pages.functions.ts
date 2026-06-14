@@ -112,6 +112,9 @@ export const createPage = createServerFn({ method: "POST" })
       .from("workspaces").select("id").eq("owner_id", userId).limit(1).maybeSingle();
     if (!ws) throw new Error("Workspace não encontrado");
 
+    await assertPageQuota(ws.id);
+
+
     const baseSlug = slugify(data.name);
     let slug = baseSlug;
     for (let i = 1; i < 50; i++) {
