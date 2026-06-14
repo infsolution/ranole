@@ -417,6 +417,14 @@ function PropertiesPanel({ section, workspaceId, onPatch }: { section: Section; 
                 value={p[field.key] as string}
                 workspaceId={workspaceId}
                 onChange={(url) => onPatch({ [field.key]: url })}
+                accept={field.accept}
+                maxSizeMB={field.maxSizeMB}
+                minWidth={field.minWidth}
+                minHeight={field.minHeight}
+                maxWidth={field.maxWidth}
+                maxHeight={field.maxHeight}
+                preserveOriginal={field.preserveOriginal}
+                helpText={field.helpText}
               />
             </Field>
           );
