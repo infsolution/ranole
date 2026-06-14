@@ -397,6 +397,15 @@ export interface BlockSchemaField {
   max?: number;
   step?: number;
   unit?: string;
+  // image-only constraints
+  accept?: string[];
+  maxSizeMB?: number;
+  minWidth?: number;
+  minHeight?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+  preserveOriginal?: boolean;
+  helpText?: string;
   itemFields?: Array<{ key: string; label: string; type: "text" | "textarea" }>;
 }
 
