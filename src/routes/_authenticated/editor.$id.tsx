@@ -417,6 +417,14 @@ function PropertiesPanel({ section, workspaceId, onPatch }: { section: Section; 
                 value={p[field.key] as string}
                 workspaceId={workspaceId}
                 onChange={(url) => onPatch({ [field.key]: url })}
+                accept={field.accept}
+                maxSizeMB={field.maxSizeMB}
+                minWidth={field.minWidth}
+                minHeight={field.minHeight}
+                maxWidth={field.maxWidth}
+                maxHeight={field.maxHeight}
+                preserveOriginal={field.preserveOriginal}
+                helpText={field.helpText}
               />
             </Field>
           );
@@ -577,15 +585,46 @@ function SeoPanel({ seo, onChange }: { seo: { title: string; description: string
   );
 }
 
-function ImageUploadField({ value, workspaceId, onChange }: { value?: string; workspaceId?: string; onChange: (url: string) => void }) {
+function ImageUploadField({
+  value,
+  workspaceId,
+  onChange,
+  accept,
+  maxSizeMB,
+  minWidth,
+  minHeight,
+  maxWidth,
+  maxHeight,
+  preserveOriginal,
+  helpText,
+}: {
+  value?: string;
+  workspaceId?: string;
+  onChange: (url: string) => void;
+  accept?: string[];
+  maxSizeMB?: number;
+  minWidth?: number;
+  minHeight?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+  preserveOriginal?: boolean;
+  helpText?: string;
+}) {
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const acceptAttr = (accept ?? ["image/png", "image/jpeg", "image/webp", "image/gif"]).join(",");
+  const hint = helpText ?? `Máx ${maxSizeMB ?? 5}MB · otimizada para WebP`;
   async function handleFile(file: File) {
     if (!workspaceId) { toast.error("Workspace indisponível"); return; }
     setBusy(true);
     try {
       const { uploadImage } = await import("@/lib/upload-image");
-      const url = await uploadImage(file, workspaceId);
+      const url = await uploadImage(file, workspaceId, {
+        accept,
+        maxBytes: maxSizeMB ? maxSizeMB * 1024 * 1024 : undefined,
+        minWidth, minHeight, maxWidth, maxHeight,
+        preserveOriginal,
+      });
       onChange(url);
       toast.success("Imagem enviada");
     } catch (e: any) {
@@ -606,7 +645,7 @@ function ImageUploadField({ value, workspaceId, onChange }: { value?: string; wo
       <input
         ref={inputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
+        accept={acceptAttr}
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
       />
@@ -616,7 +655,7 @@ function ImageUploadField({ value, workspaceId, onChange }: { value?: string; wo
           {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
           {busy ? "Enviando..." : value ? "Substituir" : "Enviar imagem"}
         </button>
-        <span className="text-[10px] text-muted-foreground">Máx 5MB · otimizada para WebP</span>
+        <span className="text-[10px] text-muted-foreground">{hint}</span>
       </div>
       <Input value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder="ou cole uma URL" className="h-8 text-xs" />
     </div>

@@ -54,9 +54,31 @@ export function sectionStyle(p: any): React.CSSProperties {
 /* ============== Block components ============== */
 
 function Hero(p: any) {
+  const hasBg = !!p.backgroundImage;
+  const rawOverlay = typeof p.backgroundOverlay === "number" ? p.backgroundOverlay : 50;
+  const overlayOpacity = Math.max(0, Math.min(1, rawOverlay > 1 ? rawOverlay / 100 : rawOverlay));
+  const baseStyle = sectionStyle(p);
+  const bgStyle: React.CSSProperties = hasBg
+    ? {
+        backgroundImage: `url("${p.backgroundImage}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }
+    : {};
   return (
-    <section className="relative overflow-hidden bg-hero ring-grid" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32 text-center">
+    <section
+      className={`relative overflow-hidden ${hasBg ? "" : "bg-hero ring-grid"}`}
+      style={{ ...baseStyle, ...bgStyle }}
+    >
+      {hasBg && (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-black"
+          style={{ opacity: overlayOpacity }}
+        />
+      )}
+      <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-32 text-center">
         {p.eyebrow && (
           <span className="inline-block rounded-full border border-border bg-surface-elevated/60 px-3 py-1 text-xs uppercase tracking-widest text-muted-foreground">
             {p.eyebrow}
@@ -374,6 +396,15 @@ export interface BlockSchemaField {
   max?: number;
   step?: number;
   unit?: string;
+  // image-only constraints
+  accept?: string[];
+  maxSizeMB?: number;
+  minWidth?: number;
+  minHeight?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+  preserveOriginal?: boolean;
+  helpText?: string;
   itemFields?: Array<{ key: string; label: string; type: "text" | "textarea" }>;
 }
 
@@ -409,6 +440,20 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
       { key: "ctaHref", label: "Link CTA", type: "text" },
       { key: "secondaryText", label: "CTA secundário", type: "text" },
       { key: "secondaryHref", label: "Link secundário", type: "text" },
+      {
+        key: "backgroundImage",
+        label: "Banner de fundo",
+        type: "image",
+        accept: ["image/jpeg", "image/png", "image/gif"],
+        maxSizeMB: 5,
+        minWidth: 1546,
+        minHeight: 423,
+        maxWidth: 2560,
+        maxHeight: 1440,
+        preserveOriginal: true,
+        helpText: "JPG, PNG ou GIF · entre 1546×423 e 2560×1440 · máx 5MB",
+      },
+      { key: "backgroundOverlay", label: "Opacidade do overlay", type: "range", min: 0, max: 100, step: 5, unit: "%" },
     ],
   },
   benefits: {
