@@ -54,9 +54,32 @@ export function sectionStyle(p: any): React.CSSProperties {
 /* ============== Block components ============== */
 
 function Hero(p: any) {
+  const hasBg = !!p.backgroundImage;
+  const overlayOpacity = typeof p.backgroundOverlay === "number"
+    ? Math.max(0, Math.min(1, p.backgroundOverlay))
+    : 0.5;
+  const baseStyle = sectionStyle(p);
+  const bgStyle: React.CSSProperties = hasBg
+    ? {
+        backgroundImage: `url("${p.backgroundImage}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }
+    : {};
   return (
-    <section className="relative overflow-hidden bg-hero ring-grid" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32 text-center">
+    <section
+      className={`relative overflow-hidden ${hasBg ? "" : "bg-hero ring-grid"}`}
+      style={{ ...baseStyle, ...bgStyle }}
+    >
+      {hasBg && (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-black"
+          style={{ opacity: overlayOpacity }}
+        />
+      )}
+      <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-32 text-center">
         {p.eyebrow && (
           <span className="inline-block rounded-full border border-border bg-surface-elevated/60 px-3 py-1 text-xs uppercase tracking-widest text-muted-foreground">
             {p.eyebrow}
