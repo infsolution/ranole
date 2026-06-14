@@ -233,6 +233,12 @@ export const publishPage = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ id: z.string().uuid(), publish: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    if (data.publish) {
+      const { data: pg, error: pErr } = await supabase
+        .from("pages").select("workspace_id").eq("id", data.id).single();
+      if (pErr) throw new Error(pErr.message);
+      await assertPublishQuota(pg.workspace_id, data.id);
+    }
     const { error } = await supabase
       .from("pages")
       .update({
