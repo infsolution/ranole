@@ -58,10 +58,11 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ priceId: z.string().min(3) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { supabase, userId, claims } = context;
+    const { userId, claims } = context;
     const email = (claims as any)?.email as string | undefined;
 
-    const { data: ws } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, stripe_customer_id")
       .eq("owner_id", userId)
