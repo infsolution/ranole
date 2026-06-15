@@ -256,6 +256,10 @@ export type Database = {
       workspaces: {
         Row: {
           created_at: string
+          custom_domain: string | null
+          custom_domain_status: string
+          custom_domain_verification_token: string | null
+          custom_domain_verified_at: string | null
           id: string
           name: string
           owner_id: string
@@ -265,6 +269,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          custom_domain?: string | null
+          custom_domain_status?: string
+          custom_domain_verification_token?: string | null
+          custom_domain_verified_at?: string | null
           id?: string
           name: string
           owner_id: string
@@ -274,6 +282,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          custom_domain?: string | null
+          custom_domain_status?: string
+          custom_domain_verification_token?: string | null
+          custom_domain_verified_at?: string | null
           id?: string
           name?: string
           owner_id?: string

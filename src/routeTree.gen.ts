@@ -16,6 +16,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as PWorkspaceSlugRouteImport } from './routes/p.$workspace.$slug'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
+import { Route as AuthenticatedSettingsDomainsRouteImport } from './routes/_authenticated/settings.domains'
 import { Route as AuthenticatedEditorIdRouteImport } from './routes/_authenticated/editor.$id'
 import { Route as AuthenticatedAnalyticsIdRouteImport } from './routes/_authenticated/analytics.$id'
 
@@ -53,6 +54,12 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsDomainsRoute =
+  AuthenticatedSettingsDomainsRouteImport.update({
+    id: '/settings/domains',
+    path: '/settings/domains',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedEditorIdRoute = AuthenticatedEditorIdRouteImport.update({
   id: '/editor/$id',
   path: '/editor/$id',
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/settings/domains': typeof AuthenticatedSettingsDomainsRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/settings/domains': typeof AuthenticatedSettingsDomainsRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
@@ -94,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/analytics/$id': typeof AuthenticatedAnalyticsIdRoute
   '/_authenticated/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/_authenticated/settings/domains': typeof AuthenticatedSettingsDomainsRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/p/$workspace/$slug': typeof PWorkspaceSlugRoute
 }
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/analytics/$id'
     | '/editor/$id'
+    | '/settings/domains'
     | '/api/public/stripe-webhook'
     | '/p/$workspace/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/analytics/$id'
     | '/editor/$id'
+    | '/settings/domains'
     | '/api/public/stripe-webhook'
     | '/p/$workspace/$slug'
   id:
@@ -127,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/analytics/$id'
     | '/_authenticated/editor/$id'
+    | '/_authenticated/settings/domains'
     | '/api/public/stripe-webhook'
     | '/p/$workspace/$slug'
   fileRoutesById: FileRoutesById
@@ -190,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings/domains': {
+      id: '/_authenticated/settings/domains'
+      path: '/settings/domains'
+      fullPath: '/settings/domains'
+      preLoaderRoute: typeof AuthenticatedSettingsDomainsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/editor/$id': {
       id: '/_authenticated/editor/$id'
       path: '/editor/$id'
@@ -212,6 +232,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedAnalyticsIdRoute: typeof AuthenticatedAnalyticsIdRoute
   AuthenticatedEditorIdRoute: typeof AuthenticatedEditorIdRoute
+  AuthenticatedSettingsDomainsRoute: typeof AuthenticatedSettingsDomainsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -219,6 +240,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedAnalyticsIdRoute: AuthenticatedAnalyticsIdRoute,
   AuthenticatedEditorIdRoute: AuthenticatedEditorIdRoute,
+  AuthenticatedSettingsDomainsRoute: AuthenticatedSettingsDomainsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -235,13 +257,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
