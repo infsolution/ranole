@@ -19,7 +19,6 @@ export const getMySubscription = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!ws) return { workspace: null, subscription: null };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: sub } = await supabaseAdmin
       .from("workspace_subscriptions")
       .select("*")
