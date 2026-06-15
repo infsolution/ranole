@@ -8,8 +8,9 @@ import { findPlanByPriceId } from "@/lib/billing";
 export const getMySubscription = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const { data: ws } = await supabase
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, name, slug, stripe_customer_id")
       .eq("owner_id", userId)
