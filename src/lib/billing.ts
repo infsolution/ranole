@@ -32,6 +32,8 @@ export const PLANS: {
     name: "Pro",
     tagline: "Para criadores e freelancers",
     features: [
+      "10 páginas publicadas",
+      "Domínio personalizado",
       "Tudo do Free",
       "Geração com IA prioritária",
       "Templates premium",
