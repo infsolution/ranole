@@ -16,7 +16,8 @@ function normalizeDomain(input: string): string {
 
 async function loadWorkspaceWithPlan(ctx: { supabase: any; userId: string }) {
   const { supabase, userId } = ctx;
-  const { data: ws, error } = await supabase
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: ws, error } = await supabaseAdmin
     .from("workspaces")
     .select(
       "id, name, slug, custom_domain, custom_domain_status, custom_domain_verification_token, custom_domain_verified_at",
@@ -28,7 +29,6 @@ async function loadWorkspaceWithPlan(ctx: { supabase: any; userId: string }) {
   if (error) throw new Error(error.message);
   if (!ws) throw new Error("Workspace não encontrado");
 
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: sub } = await supabaseAdmin
     .from("workspace_subscriptions")
     .select("plan, status")
@@ -36,7 +36,7 @@ async function loadWorkspaceWithPlan(ctx: { supabase: any; userId: string }) {
     .maybeSingle();
   const isActive = sub && ["active", "trialing"].includes(sub.status as string);
   const plan = (isActive ? (sub?.plan as string) : "free") || "free";
-  return { ws, plan, supabase };
+  return { ws, plan, supabase, supabaseAdmin };
 }
 
 export const getWorkspaceDomain = createServerFn({ method: "GET" })

@@ -8,8 +8,9 @@ import { findPlanByPriceId } from "@/lib/billing";
 export const getMySubscription = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const { data: ws } = await supabase
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, name, slug, stripe_customer_id")
       .eq("owner_id", userId)
@@ -18,7 +19,6 @@ export const getMySubscription = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!ws) return { workspace: null, subscription: null };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: sub } = await supabaseAdmin
       .from("workspace_subscriptions")
       .select("*")
@@ -58,10 +58,11 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ priceId: z.string().min(3) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { supabase, userId, claims } = context;
+    const { userId, claims } = context;
     const email = (claims as any)?.email as string | undefined;
 
-    const { data: ws } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, stripe_customer_id")
       .eq("owner_id", userId)
@@ -97,10 +98,11 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 export const openCustomerPortal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId, claims } = context;
+    const { userId, claims } = context;
     const email = (claims as any)?.email as string | undefined;
 
-    const { data: ws } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, stripe_customer_id")
       .eq("owner_id", userId)
@@ -130,10 +132,11 @@ export const openCustomerPortal = createServerFn({ method: "POST" })
 export const refreshSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId, claims } = context;
+    const { userId, claims } = context;
     const email = (claims as any)?.email as string | undefined;
 
-    const { data: ws } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, stripe_customer_id")
       .eq("owner_id", userId)
@@ -143,7 +146,6 @@ export const refreshSubscription = createServerFn({ method: "POST" })
     if (!ws) return { synced: false };
 
     const stripe = await getStripe();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let customerId = ws.stripe_customer_id;
     if (!customerId && email) {
