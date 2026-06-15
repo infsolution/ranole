@@ -89,12 +89,17 @@ function Dashboard() {
             {data?.workspace?.slug && <span className="ml-2 rounded bg-surface-elevated px-1.5 py-0.5 text-xs">{data.workspace.slug}</span>}
           </p>
         </div>
-        <form onSubmit={onCreate} className="flex w-full max-w-md items-center gap-2">
-          <Input placeholder="Nome da nova página" value={name} onChange={e => setName(e.target.value)} />
-          <button disabled={creating} className="inline-flex shrink-0 items-center gap-2 rounded-md bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow disabled:opacity-60">
-            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Criar
-          </button>
-        </form>
+        <div className="flex w-full max-w-md items-center gap-2">
+          <Link to="/settings/domains" className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-2 text-xs hover:bg-surface" title="Domínio customizado">
+            <Globe className="h-3.5 w-3.5" /> Domínios
+          </Link>
+          <form onSubmit={onCreate} className="flex flex-1 items-center gap-2">
+            <Input placeholder="Nome da nova página" value={name} onChange={e => setName(e.target.value)} />
+            <button disabled={creating} className="inline-flex shrink-0 items-center gap-2 rounded-md bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow disabled:opacity-60">
+              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Criar
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="mt-12">
