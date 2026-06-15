@@ -50,6 +50,8 @@ export const PLANS: {
     name: "Business",
     tagline: "Para agências e times",
     features: [
+      "100 páginas publicadas",
+      "Domínio personalizado",
       "Tudo do Pro",
       "Cobrança anual com 2 meses grátis",
       "Suporte prioritário",
