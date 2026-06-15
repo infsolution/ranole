@@ -223,7 +223,7 @@ function Pricing() {
 
 const faqs = [
   { q: "Como funciona o builder?", a: "Arraste blocos prontos, edite propriedades e publique. Tudo é salvo como JSON versionado." },
-  { q: "Onde minha página é publicada?", a: "Em um subdomínio do Ranole no formato /p/seu-workspace/sua-pagina. Domínio próprio ainda não está disponível." },
+  { q: "Onde minha página é publicada?", a: "Em um subdomínio do Ranole no formato /p/seu-workspace/sua-pagina. Planos Pro e Business permitem conectar um domínio próprio." },
   { q: "Posso usar IA para gerar conteúdo?", a: "Sim. O editor inclui geração de conteúdo com IA em todos os planos." },
   { q: "Posso exportar minha página?", a: "Em breve. A v0 foca em publicação no nosso host." },
 ];
