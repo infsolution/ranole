@@ -132,10 +132,11 @@ export const openCustomerPortal = createServerFn({ method: "POST" })
 export const refreshSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId, claims } = context;
+    const { userId, claims } = context;
     const email = (claims as any)?.email as string | undefined;
 
-    const { data: ws } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: ws } = await supabaseAdmin
       .from("workspaces")
       .select("id, stripe_customer_id")
       .eq("owner_id", userId)
@@ -145,7 +146,6 @@ export const refreshSubscription = createServerFn({ method: "POST" })
     if (!ws) return { synced: false };
 
     const stripe = await getStripe();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let customerId = ws.stripe_customer_id;
     if (!customerId && email) {
