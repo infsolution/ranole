@@ -15,6 +15,7 @@ export const PLANS: {
     name: "Free",
     tagline: "Para começar a explorar",
     features: [
+      "1 página publicada",
       "Editor visual completo",
       "Templates prontos",
       "Publicação em subdomínio",
