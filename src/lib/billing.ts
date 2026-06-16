@@ -32,9 +32,9 @@ export const PLANS: {
     name: "Pro",
     tagline: "Para criadores e freelancers",
     features: [
-      "100 páginas publicadas",
-      "\n",
       "Tudo do Free",
+      "Domínio personalizado",
+      "10 páginas publicadas",
       "Geração com IA prioritária",
       "Templates premium",
       "Suporte por e-mail",
@@ -50,9 +50,8 @@ export const PLANS: {
     name: "Business",
     tagline: "Para agências e times",
     features: [
-      "100 páginas publicadas",
-      "Domínio personalizado",
       "Tudo do Pro",
+      "100 páginas publicadas",
       "Cobrança anual com 2 meses grátis",
       "Suporte prioritário",
     ],
