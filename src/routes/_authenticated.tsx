@@ -1,7 +1,10 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, LogOut, CreditCard } from "lucide-react";
+import { LayoutDashboard, LogOut, CreditCard, Shield } from "lucide-react";
 import ranoleLogo from "@/assets/ranole-logo.png.asset.json";
+import { isCurrentUserAdmin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
