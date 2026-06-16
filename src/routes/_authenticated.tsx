@@ -1,7 +1,10 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, LogOut, CreditCard } from "lucide-react";
+import { LayoutDashboard, LogOut, CreditCard, Shield } from "lucide-react";
 import ranoleLogo from "@/assets/ranole-logo.png.asset.json";
+import { isCurrentUserAdmin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -17,6 +20,13 @@ export const Route = createFileRoute("/_authenticated")({
 function Layout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const checkAdmin = useServerFn(isCurrentUserAdmin);
+  const { data: adminData } = useQuery({
+    queryKey: ["is-admin"],
+    queryFn: () => checkAdmin(),
+    staleTime: 60_000,
+  });
+  const isAdmin = !!adminData?.isAdmin;
 
   async function logout() {
     await supabase.auth.signOut();
@@ -41,6 +51,12 @@ function Layout() {
                 className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/billing") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 <CreditCard className="h-4 w-4" /> Billing
               </Link>
+              {isAdmin && (
+                <Link to="/admin"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 ${pathname.startsWith("/admin") ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                  <Shield className="h-4 w-4" /> Admin
+                </Link>
+              )}
             </nav>
           </div>
           <button onClick={logout} className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
