@@ -52,7 +52,7 @@ export const PLANS: {
     features: [
       "Tudo do Pro",
       "Domínio personalizado",
-      "100 páginas publicadas",
+      "10 páginas publicadas",
       "Cobrança anual com 2 meses grátis",
       "Suporte prioritário",
     ],
