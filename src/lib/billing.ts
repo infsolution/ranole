@@ -15,7 +15,7 @@ export const PLANS: {
     name: "Free",
     tagline: "Para começar a explorar",
     features: [
-      "100 páginas publicadas",
+      "10 páginas publicadas",
       "Editor visual completo",
       "Templates prontos",
       "Tudo do Free",
@@ -34,7 +34,7 @@ export const PLANS: {
     features: [
       "100 páginas publicadas",
       "\n",
-      "Tudo do Pro",
+      "Tudo do Free",
       "Geração com IA prioritária",
       "Templates premium",
       "Suporte por e-mail",
@@ -50,9 +50,9 @@ export const PLANS: {
     name: "Business",
     tagline: "Para agências e times",
     features: [
-      "10 páginas publicadas",
+      "100 páginas publicadas",
       "Domínio personalizado",
-      "Tudo do Free",
+      "Tudo do Pro",
       "Cobrança anual com 2 meses grátis",
       "Suporte prioritário",
     ],
