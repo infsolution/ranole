@@ -20,6 +20,13 @@ export const Route = createFileRoute("/_authenticated")({
 function Layout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const checkAdmin = useServerFn(isCurrentUserAdmin);
+  const { data: adminData } = useQuery({
+    queryKey: ["is-admin"],
+    queryFn: () => checkAdmin(),
+    staleTime: 60_000,
+  });
+  const isAdmin = !!adminData?.isAdmin;
 
   async function logout() {
     await supabase.auth.signOut();
