@@ -41,8 +41,8 @@ export const PLANS: {
     ],
     highlight: true,
     prices: {
-      monthly: { amountUsd: 19, priceId: "price_1TfdELI8RpPxMEvQLeJMq7NS" },
-      yearly: { amountUsd: 190, priceId: "price_1TfdErI8RpPxMEvQCunWUwjP" },
+      monthly: { amountUsd: 19, priceId: "price_1TjJkzI8RpPxMEvQBGoEocSs" },
+      yearly: { amountUsd: 190, priceId: "price_1TjJlNI8RpPxMEvQZZ8luI6z" },
     },
   },
   {
@@ -56,8 +56,8 @@ export const PLANS: {
       "Suporte prioritário",
     ],
     prices: {
-      monthly: { amountUsd: 49, priceId: "price_1TfdFFI8RpPxMEvQHJ5gMvJl" },
-      yearly: { amountUsd: 490, priceId: "price_1TfdFjI8RpPxMEvQ0UnwLs0z" },
+      monthly: { amountUsd: 49, priceId: "price_1TjJlmI8RpPxMEvQVvpw7Rmm" },
+      yearly: { amountUsd: 490, priceId: "price_1TjJmDI8RpPxMEvQor9O3gLN" },
     },
   },
 ];
