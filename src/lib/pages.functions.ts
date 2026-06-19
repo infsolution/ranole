@@ -20,6 +20,7 @@ function starterContent(): PageContent {
 
 const PLAN_PAGE_LIMITS: Record<string, number> = {
   free: 1,
+  starter: 1,
   pro: 10,
   business: 100,
 };

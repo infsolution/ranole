@@ -1,5 +1,5 @@
 // Shared, client-safe billing plan config.
-export type PlanId = "free" | "pro" | "business";
+export type PlanId = "free" | "starter" | "pro" | "business";
 export type Cycle = "monthly" | "yearly";
 
 export const PLANS: {
@@ -25,6 +25,22 @@ export const PLANS: {
     prices: {
       monthly: { amountUsd: 0, priceId: null },
       yearly: { amountUsd: 0, priceId: null },
+    },
+  },
+  {
+    id: "starter",
+    name: "Starter",
+    tagline: "Para colocar uma página no ar com sua marca",
+    features: [
+      "1 página publicada",
+      "Domínio personalizado",
+      "Templates premium",
+      "Geração de conteúdo com IA",
+      "Suporte por e-mail",
+    ],
+    prices: {
+      monthly: { amountUsd: 9, priceId: "price_1Tk1xnI8RpPxMEvQsprIOVdE" },
+      yearly: { amountUsd: 90, priceId: "price_1Tk1yPI8RpPxMEvQi0gYLARk" },
     },
   },
   {
