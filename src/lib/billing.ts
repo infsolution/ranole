@@ -36,6 +36,7 @@ export const PLANS: {
       "Domínio personalizado",
       "Templates premium",
       "Geração de conteúdo com IA",
+      "Analytics de visualizações",
       "Suporte por e-mail",
     ],
     prices: {
