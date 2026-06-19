@@ -469,7 +469,7 @@ export type Database = {
       app_role: "admin"
       billing_cycle: "monthly" | "yearly"
       page_status: "draft" | "published" | "archived"
-      subscription_plan: "free" | "pro" | "business"
+      subscription_plan: "free" | "starter" | "pro" | "business"
       subscription_status:
         | "active"
         | "trialing"
@@ -610,7 +610,7 @@ export const Constants = {
       app_role: ["admin"],
       billing_cycle: ["monthly", "yearly"],
       page_status: ["draft", "published", "archived"],
-      subscription_plan: ["free", "pro", "business"],
+      subscription_plan: ["free", "starter", "pro", "business"],
       subscription_status: [
         "active",
         "trialing",
