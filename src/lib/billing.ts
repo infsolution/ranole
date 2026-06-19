@@ -15,10 +15,9 @@ export const PLANS: {
     name: "Free",
     tagline: "Para começar a explorar",
     features: [
-      "10 páginas publicadas",
+      "1 página publicada",
       "Editor visual completo",
       "Templates prontos",
-      "Tudo do Free",
       "Geração de conteúdo com IA",
       "Analytics de visualizações",
     ],
