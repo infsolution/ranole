@@ -9,6 +9,8 @@ import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, 
 import { toast } from "sonner";
 import { getPage, publishPage, savePage } from "@/lib/pages.functions";
 import { generatePageFromPrompt } from "@/lib/ai.functions";
+import { getMySubscription } from "@/lib/billing.functions";
+import type { PlanId } from "@/lib/billing";
 import { blockList, blockRegistry } from "@/lib/blocks/registry";
 import { newId, type PageContent, type Section, type SectionType } from "@/lib/blocks/types";
 import { RenderPage } from "@/components/blocks/RenderPage";
@@ -31,8 +33,11 @@ function Editor() {
   const save = useServerFn(savePage);
   const pub = useServerFn(publishPage);
   const aiGen = useServerFn(generatePageFromPrompt);
+  const getSub = useServerFn(getMySubscription);
 
   const { data: page, isLoading } = useQuery({ queryKey: ["page", id], queryFn: () => get({ data: { id } }) });
+  const { data: subData } = useQuery({ queryKey: ["my-subscription"], queryFn: () => getSub() });
+  const currentPlan: PlanId = (subData?.subscription?.plan as PlanId) || "free";
 
   const [name, setName] = useState("");
   const [content, setContent] = useState<PageContent>({ sections: [] });
@@ -111,7 +116,13 @@ function Editor() {
   }, [content, name, seo]);
 
   function addBlock(type: SectionType) {
-    const sec: Section = { id: newId(), type, props: { ...blockRegistry[type].defaultProps } };
+    const def = blockRegistry[type];
+    if (def.allowedPlans && !def.allowedPlans.includes(currentPlan)) {
+      toast.error(`O bloco "${def.label}" está disponível a partir do plano Starter.`);
+      navigate({ to: "/billing" });
+      return;
+    }
+    const sec: Section = { id: newId(), type, props: { ...def.defaultProps } };
     update({ sections: [...content.sections, sec] });
     setSelectedId(sec.id);
   }
