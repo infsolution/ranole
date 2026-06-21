@@ -211,12 +211,21 @@ function Editor() {
           <div className="mb-4">
             <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Adicionar bloco</h3>
             <div className="grid grid-cols-2 gap-2">
-              {blockList.map(b => (
-                <button key={b.type} onClick={() => addBlock(b.type)}
-                  className="flex flex-col items-center gap-1 rounded-md border border-border bg-background p-3 text-xs hover:bg-surface-elevated">
-                  <b.icon className="h-4 w-4" /> {b.label}
-                </button>
-              ))}
+              {blockList.map(b => {
+                const locked = !!b.allowedPlans && !b.allowedPlans.includes(currentPlan);
+                return (
+                  <button key={b.type} onClick={() => addBlock(b.type)}
+                    title={locked ? "Disponível a partir do plano Starter" : undefined}
+                    className={`relative flex flex-col items-center gap-1 rounded-md border border-border p-3 text-xs hover:bg-surface-elevated ${locked ? "bg-background/60 opacity-70" : "bg-background"}`}>
+                    <b.icon className="h-4 w-4" /> {b.label}
+                    {locked && (
+                      <span className="absolute right-1 top-1 rounded bg-primary/15 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary">
+                        Starter
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
