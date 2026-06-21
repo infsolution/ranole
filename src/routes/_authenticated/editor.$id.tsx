@@ -9,6 +9,8 @@ import { ArrowLeft, ChevronUp, ChevronDown, Trash2, Save, Globe, Plus, Loader2, 
 import { toast } from "sonner";
 import { getPage, publishPage, savePage } from "@/lib/pages.functions";
 import { generatePageFromPrompt } from "@/lib/ai.functions";
+import { getMySubscription } from "@/lib/billing.functions";
+import type { PlanId } from "@/lib/billing";
 import { blockList, blockRegistry } from "@/lib/blocks/registry";
 import { newId, type PageContent, type Section, type SectionType } from "@/lib/blocks/types";
 import { RenderPage } from "@/components/blocks/RenderPage";
@@ -31,8 +33,11 @@ function Editor() {
   const save = useServerFn(savePage);
   const pub = useServerFn(publishPage);
   const aiGen = useServerFn(generatePageFromPrompt);
+  const getSub = useServerFn(getMySubscription);
 
   const { data: page, isLoading } = useQuery({ queryKey: ["page", id], queryFn: () => get({ data: { id } }) });
+  const { data: subData } = useQuery({ queryKey: ["my-subscription"], queryFn: () => getSub() });
+  const currentPlan: PlanId = (subData?.subscription?.plan as PlanId) || "free";
 
   const [name, setName] = useState("");
   const [content, setContent] = useState<PageContent>({ sections: [] });
@@ -111,7 +116,13 @@ function Editor() {
   }, [content, name, seo]);
 
   function addBlock(type: SectionType) {
-    const sec: Section = { id: newId(), type, props: { ...blockRegistry[type].defaultProps } };
+    const def = blockRegistry[type];
+    if (def.allowedPlans && !def.allowedPlans.includes(currentPlan)) {
+      toast.error(`O bloco "${def.label}" está disponível a partir do plano Starter.`);
+      navigate({ to: "/billing" });
+      return;
+    }
+    const sec: Section = { id: newId(), type, props: { ...def.defaultProps } };
     update({ sections: [...content.sections, sec] });
     setSelectedId(sec.id);
   }
@@ -200,12 +211,21 @@ function Editor() {
           <div className="mb-4">
             <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Adicionar bloco</h3>
             <div className="grid grid-cols-2 gap-2">
-              {blockList.map(b => (
-                <button key={b.type} onClick={() => addBlock(b.type)}
-                  className="flex flex-col items-center gap-1 rounded-md border border-border bg-background p-3 text-xs hover:bg-surface-elevated">
-                  <b.icon className="h-4 w-4" /> {b.label}
-                </button>
-              ))}
+              {blockList.map(b => {
+                const locked = !!b.allowedPlans && !b.allowedPlans.includes(currentPlan);
+                return (
+                  <button key={b.type} onClick={() => addBlock(b.type)}
+                    title={locked ? "Disponível a partir do plano Starter" : undefined}
+                    className={`relative flex flex-col items-center gap-1 rounded-md border border-border p-3 text-xs hover:bg-surface-elevated ${locked ? "bg-background/60 opacity-70" : "bg-background"}`}>
+                    <b.icon className="h-4 w-4" /> {b.label}
+                    {locked && (
+                      <span className="absolute right-1 top-1 rounded bg-primary/15 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary">
+                        Starter
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
