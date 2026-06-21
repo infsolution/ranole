@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   Layout,
   Sparkles,
@@ -13,8 +14,10 @@ import {
   Check,
   ArrowRight,
   Megaphone,
+  Youtube as YoutubeIcon,
 } from "lucide-react";
 import type { SectionType } from "./types";
+import type { PlanId } from "@/lib/billing";
 
 /* ============== Tiny sanitizer: allow only <a href="..."> tags ============== */
 function sanitizeRichText(input: string): string {
