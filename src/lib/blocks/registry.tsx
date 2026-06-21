@@ -874,6 +874,25 @@ export const blockRegistry: Record<SectionType, BlockDef> = {
       { key: "shadow", label: "Sombra", type: "shadow" },
     ],
   },
+  youtube: {
+    type: "youtube",
+    label: "Vídeo YouTube",
+    icon: YoutubeIcon,
+    Component: YouTubeEmbed,
+    allowedPlans: ["starter", "pro", "business"],
+    defaultProps: {
+      title: "Assista ao vídeo",
+      subtitle: "",
+      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      allowSeek: false,
+    },
+    schema: [
+      { key: "title", label: "Título", type: "text" },
+      { key: "subtitle", label: "Subtítulo", type: "textarea" },
+      { key: "videoUrl", label: "URL do YouTube", type: "text", placeholder: "https://www.youtube.com/watch?v=..." },
+      { key: "allowSeek", label: "Permitir avançar/voltar (caso desligado, o visitante só pode pausar e o progresso é salvo)", type: "toggle" },
+    ],
+  },
 };
 
 export const blockList = Object.values(blockRegistry);
