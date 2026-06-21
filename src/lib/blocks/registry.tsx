@@ -388,6 +388,142 @@ function BannerCta(p: any) {
   );
 }
 
+function parseYoutubeId(url: string | undefined): string | null {
+  if (!url) return null;
+  const s = String(url).trim();
+  if (/^[\w-]{11}$/.test(s)) return s;
+  try {
+    const u = new URL(s);
+    if (u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("/")[0] || null;
+    if (u.searchParams.get("v")) return u.searchParams.get("v");
+    const m = u.pathname.match(/\/(embed|shorts|v)\/([\w-]{11})/);
+    if (m) return m[2];
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function YouTubeEmbed(p: any) {
+  const allowSeek = p.allowSeek === true || String(p.allowSeek) === "true";
+  const videoId = parseYoutubeId(p.videoUrl);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<any>(null);
+  const storageKey = videoId ? `yt-progress-${videoId}` : "";
+
+  useEffect(() => {
+    if (!videoId || !hostRef.current) return;
+    let cancelled = false;
+    let saveInterval: any = null;
+
+    function createPlayer() {
+      if (cancelled || !hostRef.current) return;
+      const YT = (globalThis as any).YT;
+      if (!YT?.Player) { setTimeout(createPlayer, 80); return; }
+      const saved = !allowSeek && storageKey ? Number(localStorage.getItem(storageKey) || 0) || 0 : 0;
+      const mount = document.createElement("div");
+      hostRef.current.innerHTML = "";
+      hostRef.current.appendChild(mount);
+      playerRef.current = new YT.Player(mount, {
+        videoId,
+        playerVars: {
+          controls: allowSeek ? 1 : 0,
+          disablekb: allowSeek ? 0 : 1,
+          modestbranding: 1,
+          rel: 0,
+          fs: allowSeek ? 1 : 0,
+          iv_load_policy: 3,
+          playsinline: 1,
+          start: Math.floor(saved),
+        },
+        events: {
+          onReady: (e: any) => {
+            try { if (!allowSeek && saved > 0) e.target.seekTo(saved, true); } catch { /* ignore */ }
+          },
+          onStateChange: (e: any) => {
+            if (!storageKey) return;
+            try {
+              const t = e.target.getCurrentTime?.();
+              if (typeof t === "number") localStorage.setItem(storageKey, String(t));
+            } catch { /* ignore */ }
+          },
+        },
+      });
+    }
+
+    if (!(globalThis as any).YT) {
+      const existing = document.querySelector('script[data-yt-api]');
+      if (!existing) {
+        const s = document.createElement("script");
+        s.src = "https://www.youtube.com/iframe_api";
+        s.setAttribute("data-yt-api", "1");
+        document.head.appendChild(s);
+      }
+      const prev = (globalThis as any).onYouTubeIframeAPIReady;
+      (globalThis as any).onYouTubeIframeAPIReady = () => { prev?.(); createPlayer(); };
+    } else {
+      createPlayer();
+    }
+
+    saveInterval = setInterval(() => {
+      if (!storageKey) return;
+      try {
+        const t = playerRef.current?.getCurrentTime?.();
+        if (typeof t === "number" && t > 0) localStorage.setItem(storageKey, String(t));
+      } catch { /* ignore */ }
+    }, 2000);
+
+    return () => {
+      cancelled = true;
+      if (saveInterval) clearInterval(saveInterval);
+      try {
+        const t = playerRef.current?.getCurrentTime?.();
+        if (storageKey && typeof t === "number" && t > 0) localStorage.setItem(storageKey, String(t));
+      } catch { /* ignore */ }
+      try { playerRef.current?.destroy?.(); } catch { /* ignore */ }
+    };
+  }, [videoId, allowSeek, storageKey]);
+
+  function togglePlay() {
+    try {
+      const state = playerRef.current?.getPlayerState?.();
+      if (state === 1) playerRef.current.pauseVideo();
+      else playerRef.current.playVideo();
+    } catch { /* ignore */ }
+  }
+
+  return (
+    <section className="bg-background py-16" style={sectionStyle(p)}>
+      <div className="mx-auto max-w-4xl px-6">
+        {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
+        {p.subtitle && <p className="mx-auto mb-8 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-black shadow-elegant">
+          {videoId ? (
+            <>
+              <div ref={hostRef} className="absolute inset-0 h-full w-full [&>iframe]:h-full [&>iframe]:w-full" />
+              {/* Overlay: blocks YouTube UI (logo, share, settings, related). Click toggles play/pause only — no seek. */}
+              {!allowSeek && (
+                <button
+                  type="button"
+                  aria-label="Pausar ou reproduzir vídeo"
+                  onClick={togglePlay}
+                  className="absolute inset-0 z-10 h-full w-full cursor-pointer bg-transparent"
+                />
+              )}
+              {/* Top/bottom strips always cover YouTube's title bar and bottom branding even with controls on. */}
+              <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-12 bg-gradient-to-b from-black/60 to-transparent" />
+            </>
+          ) : (
+            <div className="grid h-full w-full place-items-center p-6 text-center text-sm text-muted-foreground">
+              Cole a URL de um vídeo do YouTube nas configurações do bloco.
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ============== Registry ============== */
 
 export interface BlockSchemaField {
@@ -418,6 +554,8 @@ export interface BlockDef {
   Component: React.ComponentType<any>;
   defaultProps: Record<string, unknown>;
   schema: BlockSchemaField[];
+  /** Plans allowed to add/use this block. Omit = all plans. */
+  allowedPlans?: PlanId[];
 }
 
 export const blockRegistry: Record<SectionType, BlockDef> = {
