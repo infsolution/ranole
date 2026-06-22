@@ -500,18 +500,38 @@ function YouTubeEmbed(p: any) {
         <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-black shadow-elegant">
           {videoId ? (
             <>
-              <div ref={hostRef} className="absolute inset-0 h-full w-full [&>iframe]:h-full [&>iframe]:w-full" />
-              {/* Overlay: blocks YouTube UI (logo, share, settings, related). Click toggles play/pause only — no seek. */}
+              <div
+                ref={hostRef}
+                className={`absolute inset-0 h-full w-full [&>iframe]:h-full [&>iframe]:w-full ${!allowSeek ? "[&>iframe]:pointer-events-none" : ""}`}
+                aria-hidden={!allowSeek}
+              />
               {!allowSeek && (
-                <button
-                  type="button"
-                  aria-label="Pausar ou reproduzir vídeo"
-                  onClick={togglePlay}
-                  className="absolute inset-0 z-10 h-full w-full cursor-pointer bg-transparent"
-                />
+                <>
+                  {/* Full overlay: swallows ALL pointer/keyboard interaction. Click toggles play/pause only. */}
+                  <button
+                    type="button"
+                    aria-label="Pausar ou reproduzir vídeo"
+                    onClick={togglePlay}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onPointerDown={(e) => e.preventDefault()}
+                    onTouchStart={(e) => e.preventDefault()}
+                    onTouchMove={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Enter") e.preventDefault();
+                    }}
+                    className="absolute inset-0 z-30 h-full w-full cursor-pointer touch-none select-none bg-transparent outline-none"
+                    style={{ WebkitTapHighlightColor: "transparent" }}
+                  />
+                  {/* Belt-and-suspenders strips covering YouTube chrome (title bar + bottom progress/controls). */}
+                  <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-16 bg-gradient-to-b from-black/70 to-transparent" />
+                  <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+                </>
               )}
-              {/* Top/bottom strips always cover YouTube's title bar and bottom branding even with controls on. */}
-              <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-12 bg-gradient-to-b from-black/60 to-transparent" />
+              {allowSeek && (
+                <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-12 bg-gradient-to-b from-black/60 to-transparent" />
+              )}
             </>
           ) : (
             <div className="grid h-full w-full place-items-center p-6 text-center text-sm text-muted-foreground">
