@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createGeminiProvider } from "@/lib/ai-gateway.server";
@@ -462,36 +462,26 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
     const gemini = createGeminiProvider();
     const model = gemini("gemini-2.5-flash");
 
-    const tryStructured = async () => {
-      const { experimental_output } = await generateText({
-        model,
-        system: systemPrompt(),
-        prompt: `Brief: ${data.prompt}`,
-        experimental_output: Output.object({ schema: loosePageSchema }),
-      });
-      return parseLoosePage(experimental_output);
-    };
-
-    const tryRawJson = async () => {
+    try {
       const { text } = await generateText({
         model,
         system:
           systemPrompt() +
           `\n\nRetorne APENAS um JSON válido, sem markdown, sem cercas \`\`\`, no formato: {"sections":[{"type":"hero","props":{...}}, ...]}.`,
         prompt: `Brief: ${data.prompt}`,
+        providerOptions: {
+          google: {
+            responseMimeType: "application/json",
+          },
+        },
       });
-      return parseLoosePage(extractJson(text));
-    };
-
-    try {
-      let output: LoosePage;
-      try {
-        output = await tryStructured();
-      } catch {
-        output = await tryRawJson();
+      if (!text || !text.trim()) {
+        throw new Error("Resposta vazia do modelo Gemini");
       }
+      const output = parseLoosePage(extractJson(text));
       return { content: serializableContent(validateGeneratedContent(fillSections(output))) };
     } catch (err: unknown) {
+      console.error("[generatePageFromPrompt] failed:", err);
       throw new Error(safeGenerationError(err));
     }
   });
