@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createGeminiProvider } from "@/lib/ai-gateway.server";
 import { blockRegistry } from "@/lib/blocks/registry";
 import { newId, type PageContent, type Section, type SectionType } from "@/lib/blocks/types";
 
@@ -459,11 +459,8 @@ export const generatePageFromPrompt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ prompt: z.string().min(4).max(2000) }).parse(d))
   .handler(async ({ data }): Promise<{ content: SerializablePageContent }> => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("LOVABLE_API_KEY ausente");
-
-    const gateway = createLovableAiGatewayProvider(key);
-    const model = gateway("google/gemini-3-flash-preview");
+    const gemini = createGeminiProvider();
+    const model = gemini("gemini-2.5-flash");
 
     const tryStructured = async () => {
       const { experimental_output } = await generateText({
