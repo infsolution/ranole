@@ -179,7 +179,7 @@ function Editor() {
             </button>
           ))}
         </div>
-        <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
+        <div className="flex flex-1 items-center justify-center gap-1 sm:justify-end sm:gap-2">
           <button onClick={undo} disabled={!history.current.length} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground disabled:opacity-40">
             <Undo2 className="h-4 w-4" />
           </button>
