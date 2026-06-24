@@ -80,23 +80,23 @@ function Dashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
-      <div className="flex items-end justify-between gap-6">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Suas páginas</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl font-bold sm:text-3xl whitespace-nowrap">Suas páginas</h1>
+          <p className="mt-1 truncate text-sm text-muted-foreground">
             Workspace: <span className="text-foreground">{data?.workspace?.name ?? "—"}</span>
             {data?.workspace?.slug && <span className="ml-2 rounded bg-surface-elevated px-1.5 py-0.5 text-xs">{data.workspace.slug}</span>}
           </p>
         </div>
-        <div className="flex w-full max-w-md items-center gap-2">
-          <Link to="/settings/domains" className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-2 text-xs hover:bg-surface" title="Domínio customizado">
-            <Globe className="h-3.5 w-3.5" /> Domínios
+        <div className="flex w-full items-center gap-2 sm:max-w-md">
+          <Link to="/settings/domains" aria-label="Domínios" className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-2 text-xs hover:bg-surface" title="Domínio customizado">
+            <Globe className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Domínios</span>
           </Link>
-          <form onSubmit={onCreate} className="flex flex-1 items-center gap-2">
-            <Input placeholder="Nome da nova página" value={name} onChange={e => setName(e.target.value)} />
-            <button disabled={creating} className="inline-flex shrink-0 items-center gap-2 rounded-md bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow disabled:opacity-60">
-              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Criar
+          <form onSubmit={onCreate} className="flex min-w-0 flex-1 items-center gap-2">
+            <Input placeholder="Nome da nova página" value={name} onChange={e => setName(e.target.value)} className="min-w-0 flex-1" />
+            <button disabled={creating} aria-label="Criar página" className="inline-flex shrink-0 items-center gap-2 rounded-md bg-gradient-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-glow disabled:opacity-60 sm:px-4">
+              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} <span className="hidden sm:inline">Criar</span>
             </button>
           </form>
         </div>
