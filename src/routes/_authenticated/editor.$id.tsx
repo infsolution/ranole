@@ -205,29 +205,47 @@ function Editor() {
         </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-[260px_1fr_320px] overflow-hidden">
-        {/* Left: blocks library + structure */}
-        <aside className="overflow-y-auto border-r border-border bg-surface p-3">
-          <div className="mb-4">
-            <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Adicionar bloco</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {blockList.map(b => {
-                const locked = !!b.allowedPlans && !b.allowedPlans.includes(currentPlan);
-                return (
-                  <button key={b.type} onClick={() => addBlock(b.type)}
-                    title={locked ? "Disponível a partir do plano Starter" : undefined}
-                    className={`relative flex flex-col items-center gap-1 rounded-md border border-border p-3 text-xs hover:bg-surface-elevated ${locked ? "bg-background/60 opacity-70" : "bg-background"}`}>
-                    <b.icon className="h-4 w-4" /> {b.label}
-                    {locked && (
-                      <span className="absolute right-1 top-1 rounded bg-primary/15 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary">
-                        Starter
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+      {(() => {
+        const addBlocksGrid = (
+          <div className="grid grid-cols-2 gap-2">
+            {blockList.map(b => {
+              const locked = !!b.allowedPlans && !b.allowedPlans.includes(currentPlan);
+              return (
+                <button key={b.type} onClick={() => addBlock(b.type)}
+                  title={locked ? "Disponível a partir do plano Starter" : undefined}
+                  className={`relative flex flex-col items-center gap-1 rounded-md border border-border p-3 text-xs hover:bg-surface-elevated ${locked ? "bg-background/60 opacity-70" : "bg-background"}`}>
+                  <b.icon className="h-4 w-4" /> {b.label}
+                  {locked && (
+                    <span className="absolute right-1 top-1 rounded bg-primary/15 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary">
+                      Starter
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
+        );
+
+        const addBlocksRow = (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {blockList.map(b => {
+              const locked = !!b.allowedPlans && !b.allowedPlans.includes(currentPlan);
+              return (
+                <button key={b.type} onClick={() => addBlock(b.type)}
+                  title={locked ? "Disponível a partir do plano Starter" : undefined}
+                  className={`relative flex shrink-0 flex-col items-center gap-1 rounded-md border border-border p-2 text-[11px] hover:bg-surface-elevated ${locked ? "bg-background/60 opacity-70" : "bg-background"}`}
+                  style={{ minWidth: 72 }}>
+                  <b.icon className="h-4 w-4" /> {b.label}
+                  {locked && (
+                    <span className="absolute right-0.5 top-0.5 rounded bg-primary/15 px-1 text-[8px] font-semibold uppercase tracking-wider text-primary">S</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        );
+
+        const structurePanel = (
           <div>
             <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estrutura</h3>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -248,41 +266,81 @@ function Editor() {
               </SortableContext>
             </DndContext>
           </div>
-        </aside>
+        );
 
-        {/* Center: preview */}
-        <main className="overflow-y-auto bg-background/40 p-6">
+        const propsPanel = (
+          <>
+            <div className="mb-4 flex items-center gap-1 rounded-md border border-border bg-background p-1">
+              <button onClick={() => setRightTab("block")}
+                className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "block" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                Bloco
+              </button>
+              <button onClick={() => setRightTab("seo")}
+                className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "seo" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                SEO
+              </button>
+            </div>
+            {rightTab === "block" ? (
+              selected ? (
+                <PropertiesPanel section={selected} workspaceId={(page as any).workspace_id} onPatch={(p) => patchProps(selected.id, p)} />
+              ) : (
+                <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
+              )
+            ) : (
+              <SeoPanel seo={seo} onChange={(next) => { setSeo(next); dirty.current = true; }} />
+            )}
+          </>
+        );
+
+        const previewPanel = (
           <div className="mx-auto rounded-2xl border border-border bg-background shadow-elegant transition-all"
             style={{ width: deviceWidth, maxWidth: "100%" }}>
             <div className="overflow-hidden rounded-2xl">
               <RenderPage content={content} />
             </div>
           </div>
-        </main>
+        );
 
-        {/* Right: properties */}
-        <aside className="overflow-y-auto border-l border-border bg-surface p-4">
-          <div className="mb-4 flex items-center gap-1 rounded-md border border-border bg-background p-1">
-            <button onClick={() => setRightTab("block")}
-              className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "block" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              Bloco
-            </button>
-            <button onClick={() => setRightTab("seo")}
-              className={`flex-1 rounded px-2 py-1 text-xs font-medium transition ${rightTab === "seo" ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              SEO
-            </button>
+        return (
+          <div className="flex flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[260px_1fr_320px]">
+            {/* Mobile: horizontal blocks row */}
+            <div className="border-b border-border bg-surface p-2 lg:hidden">
+              <h3 className="mb-1 px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Adicionar bloco</h3>
+              {addBlocksRow}
+            </div>
+
+            {/* Mobile: structure + properties two columns */}
+            <div className="grid grid-cols-2 gap-0 border-b border-border lg:hidden" style={{ maxHeight: "45vh" }}>
+              <aside className="overflow-y-auto border-r border-border bg-surface p-3">
+                {structurePanel}
+              </aside>
+              <aside className="overflow-y-auto bg-surface p-3">
+                {propsPanel}
+              </aside>
+            </div>
+
+            {/* Mobile: preview full width below */}
+            <main className="overflow-y-auto bg-background/40 p-3 lg:hidden">
+              {previewPanel}
+            </main>
+
+            {/* Desktop: original 3-column layout */}
+            <aside className="hidden overflow-y-auto border-r border-border bg-surface p-3 lg:block">
+              <div className="mb-4">
+                <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Adicionar bloco</h3>
+                {addBlocksGrid}
+              </div>
+              {structurePanel}
+            </aside>
+            <main className="hidden overflow-y-auto bg-background/40 p-6 lg:block">
+              {previewPanel}
+            </main>
+            <aside className="hidden overflow-y-auto border-l border-border bg-surface p-4 lg:block">
+              {propsPanel}
+            </aside>
           </div>
-          {rightTab === "block" ? (
-            selected ? (
-              <PropertiesPanel section={selected} workspaceId={(page as any).workspace_id} onPatch={(p) => patchProps(selected.id, p)} />
-            ) : (
-              <div className="text-sm text-muted-foreground">Selecione um bloco para editar suas propriedades.</div>
-            )
-          ) : (
-            <SeoPanel seo={seo} onChange={(next) => { setSeo(next); dirty.current = true; }} />
-          )}
-        </aside>
-      </div>
+        );
+      })()}
 
       <Dialog open={aiOpen} onOpenChange={(o) => !mAi.isPending && setAiOpen(o)}>
         <DialogContent className="sm:max-w-lg">
