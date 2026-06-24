@@ -162,17 +162,15 @@ function Editor() {
   const deviceWidth = device === "mobile" ? 390 : device === "tablet" ? 768 : "100%";
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
-      {/* Topbar */}
-      <div className="flex items-center justify-between gap-4 border-b border-border bg-surface px-4 py-2">
-        <div className="flex items-center gap-3 min-w-0">
-          <Link to="/dashboard" className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-surface px-4 py-2 sm:flex-nowrap sm:gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <Link to="/dashboard" className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <Input value={name} onChange={e => { setName(e.target.value); dirty.current = true; }}
-            className="h-8 max-w-xs bg-transparent text-sm font-medium" />
+            className="h-8 w-full max-w-xs bg-transparent text-sm font-medium" />
         </div>
-        <div className="flex items-center gap-1 rounded-md border border-border bg-background p-0.5">
+        <div className="hidden items-center gap-1 rounded-md border border-border bg-background p-0.5 lg:flex">
           {([["desktop", Monitor], ["tablet", Tablet], ["mobile", Smartphone]] as const).map(([d, Icon]) => (
             <button key={d} onClick={() => setDevice(d)}
               className={`rounded p-1.5 ${device === d ? "bg-surface-elevated text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
@@ -180,7 +178,7 @@ function Editor() {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
           <button onClick={undo} disabled={!history.current.length} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground disabled:opacity-40">
             <Undo2 className="h-4 w-4" />
           </button>
@@ -188,19 +186,19 @@ function Editor() {
             <Redo2 className="h-4 w-4" />
           </button>
           <button onClick={() => setAiOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm text-primary hover:bg-primary/20">
-            <Sparkles className="h-3.5 w-3.5" /> IA
+            className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-sm text-primary hover:bg-primary/20 sm:px-3">
+            <Sparkles className="h-3.5 w-3.5" /> <span className="hidden sm:inline">IA</span>
           </button>
           <button onClick={() => mSave.mutate()} disabled={mSave.isPending}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 py-1.5 text-sm hover:bg-surface">
-            {mSave.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Salvar
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-2 py-1.5 text-sm hover:bg-surface sm:px-3">
+            {mSave.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} <span className="hidden sm:inline">Salvar</span>
           </button>
           <button onClick={() => mPub.mutate(!published)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-glow">
-            <Globe className="h-3.5 w-3.5" /> {published ? "Despublicar" : "Publicar"}
+            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-primary px-2 py-1.5 text-sm font-medium text-primary-foreground shadow-glow sm:px-3">
+            <Globe className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{published ? "Despublicar" : "Publicar"}</span>
           </button>
           {published && publicUrl && (
-            <a href={publicUrl} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-foreground">Ver pública ↗</a>
+            <a href={publicUrl} target="_blank" rel="noreferrer" className="shrink-0 text-xs text-muted-foreground hover:text-foreground">Ver ↗</a>
           )}
         </div>
       </div>
