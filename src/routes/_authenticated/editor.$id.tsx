@@ -292,8 +292,8 @@ function Editor() {
         );
 
         const previewPanel = (
-          <div className="mx-auto rounded-2xl border border-border bg-background shadow-elegant transition-all"
-            style={{ width: deviceWidth, maxWidth: "100%" }}>
+          <div className="mx-auto w-full rounded-2xl border border-border bg-background shadow-elegant transition-all lg:w-[var(--device-width)]"
+            style={{ ["--device-width" as any]: typeof deviceWidth === "number" ? `${deviceWidth}px` : deviceWidth, maxWidth: "100%" }}>
             <div className="overflow-hidden rounded-2xl">
               <RenderPage content={content} />
             </div>
