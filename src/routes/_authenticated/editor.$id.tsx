@@ -162,6 +162,7 @@ function Editor() {
   const deviceWidth = device === "mobile" ? 390 : device === "tablet" ? 768 : "100%";
 
   return (
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-surface px-4 py-2 sm:flex-nowrap sm:gap-4">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <Link to="/dashboard" className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-surface-elevated hover:text-foreground">
