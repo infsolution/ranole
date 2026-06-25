@@ -111,17 +111,17 @@ function Hero(p: any) {
 function Benefits(p: any) {
   const items: Array<{ title: string; description: string }> = p.items || [];
   return (
-    <section className="bg-background py-24" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6">
-        {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
-        {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
-        <div className="grid gap-6 md:grid-cols-3">
+    <section className="bg-background py-16 md:py-24" style={sectionStyle(p)}>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {p.title && <h2 className="mb-3 text-center text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
+        {p.subtitle && <p className="mx-auto mb-8 md:mb-12 max-w-2xl text-center text-sm md:text-base text-muted-foreground">{p.subtitle}</p>}
+        <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-3">
           {items.map((it, i) => (
-            <div key={i} className="rounded-2xl border border-border bg-surface p-6 transition hover:bg-surface-elevated">
+            <div key={i} className="rounded-2xl border border-border bg-surface p-5 md:p-6 transition hover:bg-surface-elevated">
               <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
                 <Sparkles className="h-5 w-5" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">{it.title}</h3>
+              <h3 className="mb-2 text-base md:text-lg font-semibold">{it.title}</h3>
               <p className="text-sm text-muted-foreground">{it.description}</p>
             </div>
           ))}
@@ -134,14 +134,14 @@ function Benefits(p: any) {
 function Features(p: any) {
   const items: Array<{ title: string; description: string }> = p.items || [];
   return (
-    <section className="bg-surface py-24" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6">
-        {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
-        {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
-        <div className="grid gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+    <section className="bg-surface py-16 md:py-24" style={sectionStyle(p)}>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {p.title && <h2 className="mb-3 text-center text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
+        {p.subtitle && <p className="mx-auto mb-8 md:mb-12 max-w-2xl text-center text-sm md:text-base text-muted-foreground">{p.subtitle}</p>}
+        <div className="grid grid-cols-1 gap-6 md:gap-x-10 md:gap-y-8 md:grid-cols-2 lg:grid-cols-3">
           {items.map((it, i) => (
-            <div key={i} className="border-l-2 border-primary/40 pl-4">
-              <h3 className="mb-1 font-semibold">{it.title}</h3>
+            <div key={i} className="rounded-xl border-l-2 border-primary/40 bg-transparent pl-4 md:rounded-none md:bg-transparent">
+              <h3 className="mb-1 text-base md:text-lg font-semibold">{it.title}</h3>
               <p className="text-sm text-muted-foreground">{it.description}</p>
             </div>
           ))}
@@ -271,13 +271,13 @@ function FAQ(p: any) {
 function Testimonials(p: any) {
   const items: Array<{ name: string; role: string; quote: string }> = p.items || [];
   return (
-    <section className="bg-background py-24" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6">
-        {p.title && <h2 className="mb-12 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
-        <div className="grid gap-6 md:grid-cols-3">
+    <section className="bg-background py-16 md:py-24" style={sectionStyle(p)}>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {p.title && <h2 className="mb-8 md:mb-12 text-center text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
+        <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-3">
           {items.map((it, i) => (
-            <figure key={i} className="rounded-2xl border border-border bg-surface p-6">
-              <blockquote className="text-foreground/90">"{it.quote}"</blockquote>
+            <figure key={i} className="rounded-2xl border border-border bg-surface p-5 md:p-6">
+              <blockquote className="text-sm md:text-base text-foreground/90">"{it.quote}"</blockquote>
               <figcaption className="mt-4 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{it.name}</span> · {it.role}
               </figcaption>
@@ -291,15 +291,15 @@ function Testimonials(p: any) {
 
 function Contact(p: any) {
   return (
-    <section className="bg-surface py-24" style={sectionStyle(p)}>
-      <div className="mx-auto grid max-w-5xl gap-10 px-6 md:grid-cols-2">
+    <section className="bg-surface py-16 md:py-24" style={sectionStyle(p)}>
+      <div className="mx-auto grid grid-cols-1 max-w-5xl gap-8 md:gap-10 px-4 sm:px-6 md:grid-cols-2">
         <div>
-          {p.title && <h2 className="text-3xl md:text-4xl font-bold">{p.title}</h2>}
-          {p.subtitle && <p className="mt-4 text-muted-foreground">{p.subtitle}</p>}
+          {p.title && <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
+          {p.subtitle && <p className="mt-4 text-sm md:text-base text-muted-foreground">{p.subtitle}</p>}
           {p.email && <p className="mt-6 text-sm text-muted-foreground">✉ {p.email}</p>}
           {p.phone && <p className="mt-1 text-sm text-muted-foreground">☎ {p.phone}</p>}
         </div>
-        <form className="space-y-3 rounded-2xl border border-border bg-background p-6">
+        <form className="space-y-3 rounded-2xl border border-border bg-background p-5 md:p-6">
           <input className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm" placeholder="Seu nome" />
           <input className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm" placeholder="E-mail" />
           <textarea rows={4} className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm" placeholder="Mensagem" />
