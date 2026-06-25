@@ -134,14 +134,14 @@ function Benefits(p: any) {
 function Features(p: any) {
   const items: Array<{ title: string; description: string }> = p.items || [];
   return (
-    <section className="bg-surface py-24" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6">
-        {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
-        {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
-        <div className="grid gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+    <section className="bg-surface py-16 md:py-24" style={sectionStyle(p)}>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {p.title && <h2 className="mb-3 text-center text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
+        {p.subtitle && <p className="mx-auto mb-8 md:mb-12 max-w-2xl text-center text-sm md:text-base text-muted-foreground">{p.subtitle}</p>}
+        <div className="grid grid-cols-1 gap-6 gap-x-6 md:gap-x-10 md:gap-y-8 md:grid-cols-2 lg:grid-cols-3">
           {items.map((it, i) => (
-            <div key={i} className="border-l-2 border-primary/40 pl-4">
-              <h3 className="mb-1 font-semibold">{it.title}</h3>
+            <div key={i} className="rounded-xl border-l-2 border-primary/40 bg-transparent pl-4 md:rounded-none md:bg-transparent">
+              <h3 className="mb-1 text-base md:text-lg font-semibold">{it.title}</h3>
               <p className="text-sm text-muted-foreground">{it.description}</p>
             </div>
           ))}
