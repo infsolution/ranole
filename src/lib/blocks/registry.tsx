@@ -111,17 +111,17 @@ function Hero(p: any) {
 function Benefits(p: any) {
   const items: Array<{ title: string; description: string }> = p.items || [];
   return (
-    <section className="bg-background py-24" style={sectionStyle(p)}>
-      <div className="mx-auto max-w-6xl px-6">
-        {p.title && <h2 className="mb-3 text-center text-3xl md:text-4xl font-bold">{p.title}</h2>}
-        {p.subtitle && <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">{p.subtitle}</p>}
-        <div className="grid gap-6 md:grid-cols-3">
+    <section className="bg-background py-16 md:py-24" style={sectionStyle(p)}>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {p.title && <h2 className="mb-3 text-center text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
+        {p.subtitle && <p className="mx-auto mb-8 md:mb-12 max-w-2xl text-center text-sm md:text-base text-muted-foreground">{p.subtitle}</p>}
+        <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-3">
           {items.map((it, i) => (
-            <div key={i} className="rounded-2xl border border-border bg-surface p-6 transition hover:bg-surface-elevated">
+            <div key={i} className="rounded-2xl border border-border bg-surface p-5 md:p-6 transition hover:bg-surface-elevated">
               <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
                 <Sparkles className="h-5 w-5" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">{it.title}</h3>
+              <h3 className="mb-2 text-base md:text-lg font-semibold">{it.title}</h3>
               <p className="text-sm text-muted-foreground">{it.description}</p>
             </div>
           ))}
