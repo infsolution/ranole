@@ -199,17 +199,17 @@ function Pricing() {
             const featured = !!t.highlight;
             const price = t.prices.monthly.amountUsd;
             return (
-              <div key={t.id} className={`rounded-2xl border p-8 ${featured ? "border-primary bg-gradient-primary/10 shadow-glow" : "border-border bg-surface"}`}>
+              <div key={t.id} className={`flex flex-col rounded-2xl border p-8 ${featured ? "border-primary bg-gradient-primary/10 shadow-glow" : "border-border bg-surface"}`}>
                 <h3 className="font-display text-xl font-semibold">{t.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{t.tagline}</p>
                 <div className="mt-6 flex items-end gap-1">
                   <span className="font-display text-4xl font-bold">${price}</span>
                   <span className="text-sm text-muted-foreground">/mês</span>
                 </div>
-                <ul className="mt-6 space-y-2 text-sm">
+                <ul className="mt-6 flex-1 space-y-2 text-sm">
                   {t.features.map(f => <li key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-primary-glow" />{f}</li>)}
                 </ul>
-                <Link to="/login" className={`mt-8 inline-flex w-full justify-center rounded-md px-4 py-2.5 font-medium ${featured ? "bg-gradient-primary text-primary-foreground shadow-glow" : "border border-border bg-surface-elevated"}`}>
+                <Link to="/login" className={`mt-auto inline-flex w-full justify-center rounded-md px-4 py-2.5 font-medium ${featured ? "bg-gradient-primary text-primary-foreground shadow-glow" : "border border-border bg-surface-elevated"}`}>
                   Começar
                 </Link>
               </div>
