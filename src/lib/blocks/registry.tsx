@@ -138,7 +138,7 @@ function Features(p: any) {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {p.title && <h2 className="mb-3 text-center text-2xl md:text-3xl lg:text-4xl font-bold">{p.title}</h2>}
         {p.subtitle && <p className="mx-auto mb-8 md:mb-12 max-w-2xl text-center text-sm md:text-base text-muted-foreground">{p.subtitle}</p>}
-        <div className="grid grid-cols-1 gap-6 gap-x-6 md:gap-x-10 md:gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:gap-x-10 md:gap-y-8 md:grid-cols-2 lg:grid-cols-3">
           {items.map((it, i) => (
             <div key={i} className="rounded-xl border-l-2 border-primary/40 bg-transparent pl-4 md:rounded-none md:bg-transparent">
               <h3 className="mb-1 text-base md:text-lg font-semibold">{it.title}</h3>
