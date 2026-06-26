@@ -170,9 +170,16 @@ function Dashboard() {
                       <h3 className="truncate font-semibold">{p.name}</h3>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">/{p.slug}</p>
                     </div>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${published ? "bg-primary/20 text-primary-glow" : "bg-surface-elevated text-muted-foreground"}`}>
-                      {published ? "publicada" : "rascunho"}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {p.is_home && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-400" title="Página inicial do domínio">
+                          <Home className="h-3 w-3" /> home
+                        </span>
+                      )}
+                      <span className={`rounded-full px-2 py-0.5 text-xs ${published ? "bg-primary/20 text-primary-glow" : "bg-surface-elevated text-muted-foreground"}`}>
+                        {published ? "publicada" : "rascunho"}
+                      </span>
+                    </div>
                   </div>
                   <p className="mt-4 text-xs text-muted-foreground">
                     Atualizada {new Date(p.updated_at).toLocaleDateString("pt-BR")}
