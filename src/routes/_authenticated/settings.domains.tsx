@@ -71,6 +71,7 @@ function DomainsPage() {
   const get = useServerFn(getWorkspaceDomain);
   const setFn = useServerFn(setWorkspaceDomain);
   const remove = useServerFn(removeWorkspaceDomain);
+  const verify = useServerFn(verifyWorkspaceDomain);
 
   const { data, isLoading } = useQuery({
     queryKey: ["workspace-domain"],
@@ -96,6 +97,21 @@ function DomainsPage() {
       qc.invalidateQueries({ queryKey: ["workspace-domain"] });
     },
     onError: (e: any) => toast.error(e?.message || "Falha ao remover"),
+  });
+
+  const mVerify = useMutation({
+    mutationFn: () => verify(),
+    onSuccess: (r: any) => {
+      if (r.ok) toast.success("Domínio verificado e ativo!");
+      else {
+        const msgs: string[] = [];
+        if (!r.checks.txt.ok) msgs.push("TXT _lovable ainda não propagou");
+        if (!r.checks.cname.ok) msgs.push("CNAME ainda não aponta para " + r.checks.cname.expected);
+        toast.error(msgs.join(" · ") || "Ainda não verificado");
+      }
+      qc.invalidateQueries({ queryKey: ["workspace-domain"] });
+    },
+    onError: (e: any) => toast.error(e?.message || "Falha ao verificar"),
   });
 
   if (isLoading || !data) {
