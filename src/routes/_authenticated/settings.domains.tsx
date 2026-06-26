@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Trash2,
+  RefreshCw,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
   getWorkspaceDomain,
   setWorkspaceDomain,
   removeWorkspaceDomain,
+  verifyWorkspaceDomain,
 } from "@/lib/domains.functions";
 
 export const Route = createFileRoute("/_authenticated/settings/domains")({
@@ -69,6 +71,7 @@ function DomainsPage() {
   const get = useServerFn(getWorkspaceDomain);
   const setFn = useServerFn(setWorkspaceDomain);
   const remove = useServerFn(removeWorkspaceDomain);
+  const verify = useServerFn(verifyWorkspaceDomain);
 
   const { data, isLoading } = useQuery({
     queryKey: ["workspace-domain"],
@@ -94,6 +97,21 @@ function DomainsPage() {
       qc.invalidateQueries({ queryKey: ["workspace-domain"] });
     },
     onError: (e: any) => toast.error(e?.message || "Falha ao remover"),
+  });
+
+  const mVerify = useMutation({
+    mutationFn: () => verify(),
+    onSuccess: (r: any) => {
+      if (r.ok) toast.success("Domínio verificado e ativo!");
+      else {
+        const msgs: string[] = [];
+        if (!r.checks.txt.ok) msgs.push("TXT _lovable ainda não propagou");
+        if (!r.checks.cname.ok) msgs.push("CNAME ainda não aponta para " + r.checks.cname.expected);
+        toast.error(msgs.join(" · ") || "Ainda não verificado");
+      }
+      qc.invalidateQueries({ queryKey: ["workspace-domain"] });
+    },
+    onError: (e: any) => toast.error(e?.message || "Falha ao verificar"),
   });
 
   if (isLoading || !data) {
@@ -155,21 +173,35 @@ function DomainsPage() {
                 <div className="rounded-md border border-border bg-surface px-3 py-2">
                   <code className="font-mono text-sm">{current}</code>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm("Remover domínio customizado?")) mRemove.mutate();
-                  }}
-                  disabled={mRemove.isPending}
-                >
-                  {mRemove.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                  Remover domínio
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => mVerify.mutate()}
+                    disabled={mVerify.isPending}
+                  >
+                    {mVerify.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4" />
+                    )}
+                    Verificar DNS agora
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Remover domínio customizado?")) mRemove.mutate();
+                    }}
+                    disabled={mRemove.isPending}
+                  >
+                    {mRemove.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    Remover domínio
+                  </Button>
+                </div>
               </div>
             ) : (
               <form
@@ -231,8 +263,8 @@ function DomainsPage() {
               <div className="mt-5 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <p>
-                  A configuração foi salva. A verificação automática de DNS e a emissão de SSL serão habilitadas em breve.
-                  Enquanto isso, suas páginas continuam acessíveis pela URL padrão.
+                  Depois de configurar os registros no seu provedor, clique em "Verificar DNS agora". A propagação pode levar alguns minutos.
+                  A emissão de SSL para o domínio é feita pela Lovable após o domínio entrar em status ativo.
                 </p>
               </div>
 

@@ -2,10 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { createPage, deletePage, duplicatePage, listMyPages, publishPage } from "@/lib/pages.functions";
+import { createPage, deletePage, duplicatePage, listMyPages, publishPage, setHomePage } from "@/lib/pages.functions";
 import { templates } from "@/lib/templates";
 import { Input } from "@/components/ui/input";
-import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate, Search } from "lucide-react";
+import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate, Search, Home } from "lucide-react";
 import { toast } from "sonner";
 import { TemplateThumbnail } from "@/components/TemplateThumbnail";
 
@@ -22,6 +22,7 @@ function Dashboard() {
   const del = useServerFn(deletePage);
   const dup = useServerFn(duplicatePage);
   const pub = useServerFn(publishPage);
+  const home = useServerFn(setHomePage);
 
   const { data, isLoading } = useQuery({ queryKey: ["pages"], queryFn: () => list() });
   const [name, setName] = useState("");
@@ -53,6 +54,11 @@ function Dashboard() {
   const mPub = useMutation({
     mutationFn: ({ id, publish }: { id: string; publish: boolean }) => pub({ data: { id, publish } }),
     onSuccess: (_, v) => { toast.success(v.publish ? "Publicada" : "Despublicada"); qc.invalidateQueries({ queryKey: ["pages"] }); },
+  });
+  const mHome = useMutation({
+    mutationFn: (id: string) => home({ data: { id } }),
+    onSuccess: () => { toast.success("Definida como página inicial do domínio"); qc.invalidateQueries({ queryKey: ["pages"] }); },
+    onError: (e: any) => toast.error(e?.message || "Falha"),
   });
 
   async function onCreate(e: React.FormEvent) {
@@ -164,9 +170,16 @@ function Dashboard() {
                       <h3 className="truncate font-semibold">{p.name}</h3>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">/{p.slug}</p>
                     </div>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${published ? "bg-primary/20 text-primary-glow" : "bg-surface-elevated text-muted-foreground"}`}>
-                      {published ? "publicada" : "rascunho"}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {p.is_home && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-400" title="Página inicial do domínio">
+                          <Home className="h-3 w-3" /> home
+                        </span>
+                      )}
+                      <span className={`rounded-full px-2 py-0.5 text-xs ${published ? "bg-primary/20 text-primary-glow" : "bg-surface-elevated text-muted-foreground"}`}>
+                        {published ? "publicada" : "rascunho"}
+                      </span>
+                    </div>
                   </div>
                   <p className="mt-4 text-xs text-muted-foreground">
                     Atualizada {new Date(p.updated_at).toLocaleDateString("pt-BR")}
@@ -188,6 +201,11 @@ function Dashboard() {
                     <Link to="/analytics/$id" params={{ id: p.id }} className="ml-auto rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Analytics">
                       <BarChart3 className="h-3.5 w-3.5" />
                     </Link>
+                    {published && !p.is_home && (
+                      <button onClick={() => mHome.mutate(p.id)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Definir como página inicial do domínio">
+                        <Home className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                     <button onClick={() => mDup.mutate(p.id)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Duplicar">
                       <Copy className="h-3.5 w-3.5" />
                     </button>

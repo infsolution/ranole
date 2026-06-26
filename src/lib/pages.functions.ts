@@ -92,11 +92,78 @@ export const listMyPages = createServerFn({ method: "GET" })
 
     const { data, error } = await supabase
       .from("pages")
-      .select("id, name, slug, status, updated_at, published_at")
+      .select("id, name, slug, status, updated_at, published_at, is_home")
       .eq("workspace_id", ws.id)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { workspace: ws, pages: data || [] };
+  });
+
+export const setHomePage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: pg, error: pErr } = await supabase
+      .from("pages").select("workspace_id, status").eq("id", data.id).single();
+    if (pErr) throw new Error(pErr.message);
+    if (pg.status !== "published") {
+      throw new Error("Publique a página antes de marcá-la como inicial.");
+    }
+    // Clear current home then set new one (admin client because unique partial index)
+    const { error: clearErr } = await supabaseAdmin
+      .from("pages")
+      .update({ is_home: false })
+      .eq("workspace_id", pg.workspace_id)
+      .eq("is_home", true);
+    if (clearErr) throw new Error(clearErr.message);
+    const { error } = await supabaseAdmin
+      .from("pages").update({ is_home: true }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/* Public — resolve a custom domain Host header to a workspace page.
+   Called by the host-aware root and slug routes during SSR. */
+export const resolveHostPage = createServerFn({ method: "GET" })
+  .inputValidator((d) =>
+    z.object({
+      host: z.string().min(3).max(253),
+      slug: z.string().min(1).max(80).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const host = data.host.toLowerCase().replace(/:\d+$/, "");
+    // Ignore Lovable hosts — landing page should render normally there
+    if (
+      host.endsWith(".lovable.app") ||
+      host.endsWith(".lovable.dev") ||
+      host === "localhost" ||
+      host.startsWith("127.") ||
+      host.startsWith("192.168.")
+    ) {
+      return null;
+    }
+    const { data: ws } = await supabaseAdmin
+      .from("workspaces")
+      .select("id, slug")
+      .eq("custom_domain", host)
+      .eq("custom_domain_status", "active")
+      .maybeSingle();
+    if (!ws) return null;
+
+    const query = supabaseAdmin
+      .from("pages")
+      .select("id, name, content, theme, seo, status, slug")
+      .eq("workspace_id", ws.id)
+      .eq("status", "published");
+
+    const { data: page } = data.slug
+      ? await query.eq("slug", data.slug).maybeSingle()
+      : await query.eq("is_home", true).maybeSingle();
+
+    if (!page) return null;
+    return { workspaceSlug: ws.slug, page };
   });
 
 export const createPage = createServerFn({ method: "POST" })
