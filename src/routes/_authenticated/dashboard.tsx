@@ -55,6 +55,11 @@ function Dashboard() {
     mutationFn: ({ id, publish }: { id: string; publish: boolean }) => pub({ data: { id, publish } }),
     onSuccess: (_, v) => { toast.success(v.publish ? "Publicada" : "Despublicada"); qc.invalidateQueries({ queryKey: ["pages"] }); },
   });
+  const mHome = useMutation({
+    mutationFn: (id: string) => home({ data: { id } }),
+    onSuccess: () => { toast.success("Definida como página inicial do domínio"); qc.invalidateQueries({ queryKey: ["pages"] }); },
+    onError: (e: any) => toast.error(e?.message || "Falha"),
+  });
 
   async function onCreate(e: React.FormEvent) {
     e.preventDefault();
