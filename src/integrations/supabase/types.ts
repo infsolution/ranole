@@ -187,6 +187,7 @@ export type Database = {
           created_by: string | null
           current_version: number
           id: string
+          is_home: boolean
           name: string
           published_at: string | null
           seo: Json
@@ -202,6 +203,7 @@ export type Database = {
           created_by?: string | null
           current_version?: number
           id?: string
+          is_home?: boolean
           name: string
           published_at?: string | null
           seo?: Json
@@ -217,6 +219,7 @@ export type Database = {
           created_by?: string | null
           current_version?: number
           id?: string
+          is_home?: boolean
           name?: string
           published_at?: string | null
           seo?: Json
@@ -462,6 +465,14 @@ export type Database = {
           message: Json
           msg_id: number
           read_ct: number
+        }[]
+      }
+      resolve_custom_domain: {
+        Args: { _host: string }
+        Returns: {
+          home_page_slug: string
+          workspace_id: string
+          workspace_slug: string
         }[]
       }
     }
