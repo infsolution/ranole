@@ -22,6 +22,7 @@ function Dashboard() {
   const del = useServerFn(deletePage);
   const dup = useServerFn(duplicatePage);
   const pub = useServerFn(publishPage);
+  const home = useServerFn(setHomePage);
 
   const { data, isLoading } = useQuery({ queryKey: ["pages"], queryFn: () => list() });
   const [name, setName] = useState("");
