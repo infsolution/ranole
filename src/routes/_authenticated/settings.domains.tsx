@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Trash2,
+  RefreshCw,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
   getWorkspaceDomain,
   setWorkspaceDomain,
   removeWorkspaceDomain,
+  verifyWorkspaceDomain,
 } from "@/lib/domains.functions";
 
 export const Route = createFileRoute("/_authenticated/settings/domains")({
