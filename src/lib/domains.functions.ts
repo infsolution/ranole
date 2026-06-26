@@ -116,3 +116,54 @@ export const removeWorkspaceDomain = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+const TARGET_CNAME = "ranole.lovable.app";
+
+type DohAnswer = { name: string; type: number; data: string };
+async function dohQuery(name: string, type: "TXT" | "CNAME" | "A"): Promise<DohAnswer[]> {
+  const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(name)}&type=${type}`;
+  const res = await fetch(url, { headers: { Accept: "application/dns-json" } });
+  if (!res.ok) return [];
+  const json = (await res.json()) as { Answer?: DohAnswer[] };
+  return json.Answer ?? [];
+}
+
+function stripQuotes(s: string) {
+  return s.replace(/^"|"$/g, "").replace(/""/g, "");
+}
+
+export const verifyWorkspaceDomain = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { ws, supabase } = await loadWorkspaceWithPlan(context);
+    const domain = ws.custom_domain as string | null;
+    const token = ws.custom_domain_verification_token as string | null;
+    if (!domain || !token) {
+      throw new Error("Configure um domínio antes de verificar.");
+    }
+
+    // 1) TXT _lovable.<domain> must contain the token
+    const txtAnswers = await dohQuery(`_lovable.${domain}`, "TXT");
+    const txtFound = txtAnswers.some((a) => stripQuotes(a.data).trim() === token);
+
+    // 2) CNAME of domain must point to TARGET_CNAME (subdomains) OR root with A record fallback
+    const cnameAnswers = await dohQuery(domain, "CNAME");
+    const cnameFound = cnameAnswers.some((a) =>
+      a.data.replace(/\.$/, "").toLowerCase() === TARGET_CNAME,
+    );
+
+    const checks = {
+      txt: { ok: txtFound, expected: token, found: txtAnswers.map((a) => stripQuotes(a.data)) },
+      cname: { ok: cnameFound, expected: TARGET_CNAME, found: cnameAnswers.map((a) => a.data.replace(/\.$/, "")) },
+    };
+
+    const allOk = txtFound && cnameFound;
+    const update: Record<string, unknown> = {
+      custom_domain_status: allOk ? "active" : "pending",
+    };
+    if (allOk) update.custom_domain_verified_at = new Date().toISOString();
+    const { error } = await supabase.from("workspaces").update(update).eq("id", ws.id);
+    if (error) throw new Error(error.message);
+
+    return { ok: allOk, status: allOk ? "active" : "pending", checks };
+  });
