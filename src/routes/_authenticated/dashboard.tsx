@@ -201,6 +201,11 @@ function Dashboard() {
                     <Link to="/analytics/$id" params={{ id: p.id }} className="ml-auto rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Analytics">
                       <BarChart3 className="h-3.5 w-3.5" />
                     </Link>
+                    {published && !p.is_home && (
+                      <button onClick={() => mHome.mutate(p.id)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Definir como página inicial do domínio">
+                        <Home className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                     <button onClick={() => mDup.mutate(p.id)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground" title="Duplicar">
                       <Copy className="h-3.5 w-3.5" />
                     </button>
