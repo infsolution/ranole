@@ -2,10 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { createPage, deletePage, duplicatePage, listMyPages, publishPage } from "@/lib/pages.functions";
+import { createPage, deletePage, duplicatePage, listMyPages, publishPage, setHomePage } from "@/lib/pages.functions";
 import { templates } from "@/lib/templates";
 import { Input } from "@/components/ui/input";
-import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate, Search } from "lucide-react";
+import { Plus, ExternalLink, Copy, Trash2, Globe, FileText, Loader2, BarChart3, LayoutTemplate, Search, Home } from "lucide-react";
 import { toast } from "sonner";
 import { TemplateThumbnail } from "@/components/TemplateThumbnail";
 
