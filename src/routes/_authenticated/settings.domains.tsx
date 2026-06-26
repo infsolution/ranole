@@ -263,8 +263,8 @@ function DomainsPage() {
               <div className="mt-5 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <p>
-                  A configuração foi salva. A verificação automática de DNS e a emissão de SSL serão habilitadas em breve.
-                  Enquanto isso, suas páginas continuam acessíveis pela URL padrão.
+                  Depois de configurar os registros no seu provedor, clique em "Verificar DNS agora". A propagação pode levar alguns minutos.
+                  A emissão de SSL para o domínio é feita pela Lovable após o domínio entrar em status ativo.
                 </p>
               </div>
 
