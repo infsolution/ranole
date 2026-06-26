@@ -173,21 +173,35 @@ function DomainsPage() {
                 <div className="rounded-md border border-border bg-surface px-3 py-2">
                   <code className="font-mono text-sm">{current}</code>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm("Remover domínio customizado?")) mRemove.mutate();
-                  }}
-                  disabled={mRemove.isPending}
-                >
-                  {mRemove.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                  Remover domínio
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => mVerify.mutate()}
+                    disabled={mVerify.isPending}
+                  >
+                    {mVerify.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4" />
+                    )}
+                    Verificar DNS agora
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Remover domínio customizado?")) mRemove.mutate();
+                    }}
+                    disabled={mRemove.isPending}
+                  >
+                    {mRemove.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    Remover domínio
+                  </Button>
+                </div>
               </div>
             ) : (
               <form
