@@ -1,19 +1,89 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { Sparkles, Zap, Layers, Palette, Globe, BarChart3, ArrowRight, Check } from "lucide-react";
 import ranoleLogo from "@/assets/ranole-logo.png.asset.json";
+import { getCurrentHost } from "@/lib/host.functions";
+import { resolveHostPage, trackEvent } from "@/lib/pages.functions";
+import { RenderPage } from "@/components/blocks/RenderPage";
+import type { PageContent } from "@/lib/blocks/types";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Ranole — Construa páginas SaaS que convertem" },
-      { name: "description", content: "Plataforma visual para criar landing pages, sites institucionais e funis. Multi-tenant, versionado e pronto para escalar." },
-      { property: "og:title", content: "Ranole — Construa páginas SaaS que convertem" },
-      { property: "og:description", content: "Builder visual com componentes Atomic Design e arquitetura enterprise." },
-    ],
-  }),
-  component: Landing,
+  loader: async () => {
+    const host = await getCurrentHost();
+    if (!host) return { mode: "landing" as const };
+    const match = await resolveHostPage({ data: { host } });
+    if (!match) return { mode: "landing" as const };
+    return { mode: "custom" as const, page: match.page };
+  },
+  head: ({ loaderData }) => {
+    if (loaderData?.mode === "custom") {
+      const p: any = loaderData.page;
+      return {
+        meta: [
+          { title: p.seo?.title || p.name },
+          { name: "description", content: p.seo?.description || "" },
+          { property: "og:title", content: p.seo?.title || p.name },
+          { property: "og:description", content: p.seo?.description || "" },
+        ],
+      };
+    }
+    return {
+      meta: [
+        { title: "Ranole — Construa páginas SaaS que convertem" },
+        { name: "description", content: "Plataforma visual para criar landing pages, sites institucionais e funis. Multi-tenant, versionado e pronto para escalar." },
+        { property: "og:title", content: "Ranole — Construa páginas SaaS que convertem" },
+        { property: "og:description", content: "Builder visual com componentes Atomic Design e arquitetura enterprise." },
+      ],
+    };
+  },
+  component: RootRoute,
+  errorComponent: ({ error }) => (
+    <div className="grid min-h-screen place-items-center bg-background p-6 text-center">
+      <p className="text-muted-foreground">Erro: {error.message}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="grid min-h-screen place-items-center bg-background p-6 text-center">
+      <p className="text-muted-foreground">Página não encontrada.</p>
+    </div>
+  ),
 });
+
+function RootRoute() {
+  const data = Route.useLoaderData();
+  if (data.mode === "custom") return <CustomDomainPage page={data.page as any} />;
+  return <Landing />;
+}
+
+function CustomDomainPage({ page }: { page: any }) {
+  useEffect(() => {
+    const sid =
+      sessionStorage.getItem("sid") ??
+      (() => {
+        const s = Math.random().toString(36).slice(2);
+        sessionStorage.setItem("sid", s);
+        return s;
+      })();
+    trackEvent({ data: { pageId: page.id, eventType: "pageview", sessionId: sid } }).catch(() => {});
+  }, [page.id]);
+  return (
+    <div
+      onClick={(e) => {
+        const a = (e.target as HTMLElement).closest("a");
+        if (a) {
+          const sid = sessionStorage.getItem("sid") || undefined;
+          trackEvent({
+            data: { pageId: page.id, eventType: "click", sessionId: sid, properties: { href: a.getAttribute("href") } },
+          }).catch(() => {});
+        }
+      }}
+    >
+      <RenderPage content={page.content as unknown as PageContent} />
+    </div>
+  );
+}
+
 
 function Landing() {
   return (
