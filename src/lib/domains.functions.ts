@@ -117,7 +117,7 @@ export const removeWorkspaceDomain = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const TARGET_CNAME = "ranole.lovable.app";
+const TARGET_A_RECORD = "185.158.133.1";
 
 type DohAnswer = { name: string; type: number; data: string };
 async function dohQuery(name: string, type: "TXT" | "CNAME" | "A"): Promise<DohAnswer[]> {
@@ -142,22 +142,21 @@ export const verifyWorkspaceDomain = createServerFn({ method: "POST" })
       throw new Error("Configure um domínio antes de verificar.");
     }
 
-    // 1) TXT _lovable.<domain> must contain the token
+    // 1) TXT _lovable.<domain> must contain the verification token (proves ownership)
     const txtAnswers = await dohQuery(`_lovable.${domain}`, "TXT");
     const txtFound = txtAnswers.some((a) => stripQuotes(a.data).trim() === token);
 
-    // 2) CNAME of domain must point to TARGET_CNAME (subdomains) OR root with A record fallback
-    const cnameAnswers = await dohQuery(domain, "CNAME");
-    const cnameFound = cnameAnswers.some((a) =>
-      a.data.replace(/\.$/, "").toLowerCase() === TARGET_CNAME,
-    );
+    // 2) Domain must point to the Lovable edge: A record 185.158.133.1
+    //    (or a CNAME chain that eventually resolves to it — Cloudflare DoH follows CNAME and returns the final A)
+    const aAnswers = await dohQuery(domain, "A");
+    const aFound = aAnswers.some((a) => a.data.trim() === TARGET_A_RECORD);
 
     const checks = {
       txt: { ok: txtFound, expected: token, found: txtAnswers.map((a) => stripQuotes(a.data)) },
-      cname: { ok: cnameFound, expected: TARGET_CNAME, found: cnameAnswers.map((a) => a.data.replace(/\.$/, "")) },
+      a: { ok: aFound, expected: TARGET_A_RECORD, found: aAnswers.map((a) => a.data) },
     };
 
-    const allOk = txtFound && cnameFound;
+    const allOk = txtFound && aFound;
     const update: Record<string, unknown> = {
       custom_domain_status: allOk ? "active" : "pending",
     };
@@ -167,3 +166,4 @@ export const verifyWorkspaceDomain = createServerFn({ method: "POST" })
 
     return { ok: allOk, status: allOk ? "active" : "pending", checks };
   });
+

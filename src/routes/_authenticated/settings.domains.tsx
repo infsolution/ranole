@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/settings/domains")({
   notFoundComponent: () => <div className="p-6 text-sm">Não encontrado.</div>,
 });
 
-const TARGET_CNAME = "ranole.lovable.app";
+const TARGET_A_RECORD = "185.158.133.1";
 
 function StatusPill({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
@@ -106,7 +106,7 @@ function DomainsPage() {
       else {
         const msgs: string[] = [];
         if (!r.checks.txt.ok) msgs.push("TXT _lovable ainda não propagou");
-        if (!r.checks.cname.ok) msgs.push("CNAME ainda não aponta para " + r.checks.cname.expected);
+        if (!r.checks.a.ok) msgs.push("A record ainda não aponta para " + r.checks.a.expected);
         toast.error(msgs.join(" · ") || "Ainda não verificado");
       }
       qc.invalidateQueries({ queryKey: ["workspace-domain"] });
@@ -229,20 +229,24 @@ function DomainsPage() {
             <section className="mt-6 rounded-2xl border border-border bg-surface-elevated p-6">
               <h2 className="font-display text-lg">Configuração de DNS</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Adicione os registros abaixo no seu provedor de DNS. A propagação pode levar até 72 horas.
+                Configure os 2 registros abaixo no seu provedor de DNS (Registro.br, Cloudflare, GoDaddy, etc.).
+                A propagação leva de alguns minutos até 72 horas.
               </p>
 
               <div className="mt-5 space-y-5">
                 <div className="rounded-lg border border-border bg-surface p-4">
                   <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                     <span className="rounded bg-primary/15 px-2 py-0.5 text-primary-glow">Passo 1</span>
-                    Apontar o domínio
+                    Apontar o domínio para a Lovable
                   </div>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <CopyField label="Tipo" value="CNAME" />
+                    <CopyField label="Tipo" value="A" />
                     <CopyField label="Nome" value={current.split(".").length > 2 ? current.split(".")[0] : "@"} />
-                    <CopyField label="Valor" value={TARGET_CNAME} />
+                    <CopyField label="Valor" value={TARGET_A_RECORD} />
                   </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Dica: adicione também um registro <code className="rounded bg-surface-elevated px-1">A www</code> com o mesmo valor para que <code className="rounded bg-surface-elevated px-1">www.{current}</code> também resolva.
+                  </p>
                 </div>
 
                 {verificationToken && (
@@ -258,19 +262,28 @@ function DomainsPage() {
                     </div>
                   </div>
                 )}
+
+                <div className="rounded-lg border border-border bg-surface p-4">
+                  <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+                    <span className="rounded bg-primary/15 px-2 py-0.5 text-primary-glow">Passo 3</span>
+                    Anexar o domínio no projeto (emissão de SSL)
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Depois que o DNS propagar, abra <strong>Configurações do projeto → Domínios</strong> na Lovable e clique em <em>Connect Domain</em> usando <code className="rounded bg-surface-elevated px-1">{current}</code>. Esse passo emite o certificado SSL automaticamente. Sem ele, o domínio não responde via HTTPS.
+                  </p>
+                </div>
               </div>
 
               <div className="mt-5 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <p>
-                  Depois de configurar os registros no seu provedor, clique em "Verificar DNS agora". A propagação pode levar alguns minutos.
-                  A emissão de SSL para o domínio é feita pela Lovable após o domínio entrar em status ativo.
+                  Após configurar os DNS e anexar na Lovable, clique em <strong>Verificar DNS agora</strong>. Quando o status ficar <strong>Ativo</strong>, defina a página inicial do domínio no Dashboard (ícone de casa em uma página publicada).
                 </p>
               </div>
 
               {status === "active" && (
                 <div className="mt-3 flex items-center gap-2 text-sm text-primary-glow">
-                  <CheckCircle2 className="h-4 w-4" /> Domínio ativo
+                  <CheckCircle2 className="h-4 w-4" /> Domínio ativo — sua home será servida em {current}
                 </div>
               )}
             </section>
