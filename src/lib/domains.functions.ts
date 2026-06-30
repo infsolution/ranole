@@ -117,7 +117,11 @@ export const removeWorkspaceDomain = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const TARGET_A_RECORD = "185.158.133.1";
+// Users point their domain (via CNAME, proxied through Cloudflare/similar on
+// their own account) to this host. SSL is issued on their proxy. Lovable
+// receives the request via the Host header and resolves it to the workspace's
+// home page in `/$slug.tsx` + `resolve_custom_domain`.
+const PROXY_TARGET_HOST = "ranole.com";
 
 type DohAnswer = { name: string; type: number; data: string };
 async function dohQuery(name: string, type: "TXT" | "CNAME" | "A"): Promise<DohAnswer[]> {
@@ -131,6 +135,12 @@ async function dohQuery(name: string, type: "TXT" | "CNAME" | "A"): Promise<DohA
 function stripQuotes(s: string) {
   return s.replace(/^"|"$/g, "").replace(/""/g, "");
 }
+
+function normalizeHost(h: string) {
+  return h.trim().toLowerCase().replace(/\.$/, "");
+}
+
+export { PROXY_TARGET_HOST };
 
 export const verifyWorkspaceDomain = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -146,17 +156,49 @@ export const verifyWorkspaceDomain = createServerFn({ method: "POST" })
     const txtAnswers = await dohQuery(`_lovable.${domain}`, "TXT");
     const txtFound = txtAnswers.some((a) => stripQuotes(a.data).trim() === token);
 
-    // 2) Domain must point to the Lovable edge: A record 185.158.133.1
-    //    (or a CNAME chain that eventually resolves to it — Cloudflare DoH follows CNAME and returns the final A)
-    const aAnswers = await dohQuery(domain, "A");
-    const aFound = aAnswers.some((a) => a.data.trim() === TARGET_A_RECORD);
+    // 2) Domain must proxy to our app. Accept either:
+    //    - a CNAME chain pointing to ranole.com (proxied via Cloudflare/similar), OR
+    //    - the resolved A record matching what ranole.com currently resolves to
+    //      (when the user's proxy hides the CNAME in transparent mode)
+    const cnameAnswers = await dohQuery(domain, "CNAME");
+    const cnameHosts = cnameAnswers.map((a) => normalizeHost(a.data));
+    const cnameFound = cnameHosts.some(
+      (h) => h === PROXY_TARGET_HOST || h.endsWith("." + PROXY_TARGET_HOST),
+    );
+
+    let aFound = false;
+    let aExpected: string[] = [];
+    let aActual: string[] = [];
+    if (!cnameFound) {
+      const [targetA, domainA] = await Promise.all([
+        dohQuery(PROXY_TARGET_HOST, "A"),
+        dohQuery(domain, "A"),
+      ]);
+      aExpected = targetA.map((a) => a.data);
+      aActual = domainA.map((a) => a.data);
+      aFound =
+        aActual.length > 0 && aExpected.length > 0 &&
+        aActual.every((ip) => aExpected.includes(ip));
+    }
+
+    const proxyOk = cnameFound || aFound;
 
     const checks = {
-      txt: { ok: txtFound, expected: token, found: txtAnswers.map((a) => stripQuotes(a.data)) },
-      a: { ok: aFound, expected: TARGET_A_RECORD, found: aAnswers.map((a) => a.data) },
+      txt: {
+        ok: txtFound,
+        expected: token,
+        found: txtAnswers.map((a) => stripQuotes(a.data)),
+      },
+      proxy: {
+        ok: proxyOk,
+        expectedCname: PROXY_TARGET_HOST,
+        foundCname: cnameHosts,
+        expectedA: aExpected,
+        foundA: aActual,
+      },
     };
 
-    const allOk = txtFound && aFound;
+    const allOk = txtFound && proxyOk;
     const update: Record<string, unknown> = {
       custom_domain_status: allOk ? "active" : "pending",
     };
@@ -166,4 +208,5 @@ export const verifyWorkspaceDomain = createServerFn({ method: "POST" })
 
     return { ok: allOk, status: allOk ? "active" : "pending", checks };
   });
+
 
