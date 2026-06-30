@@ -106,7 +106,7 @@ function DomainsPage() {
       else {
         const msgs: string[] = [];
         if (!r.checks.txt.ok) msgs.push("TXT _lovable ainda não propagou");
-        if (!r.checks.a.ok) msgs.push("A record ainda não aponta para " + r.checks.a.expected);
+        if (!r.checks.proxy.ok) msgs.push(`CNAME ainda não aponta para ${PROXY_TARGET_HOST}`);
         toast.error(msgs.join(" · ") || "Ainda não verificado");
       }
       qc.invalidateQueries({ queryKey: ["workspace-domain"] });
