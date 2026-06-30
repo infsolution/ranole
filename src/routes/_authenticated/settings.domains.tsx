@@ -229,23 +229,29 @@ function DomainsPage() {
             <section className="mt-6 rounded-2xl border border-border bg-surface-elevated p-6">
               <h2 className="font-display text-lg">Configuração de DNS</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Configure os 2 registros abaixo no seu provedor de DNS (Registro.br, Cloudflare, GoDaddy, etc.).
-                A propagação leva de alguns minutos até 72 horas.
+                Conecte seu domínio através de um proxy CDN (Cloudflare, Fastly, Bunny, etc.) na sua
+                própria conta. O SSL é emitido automaticamente lá e o tráfego é encaminhado para o
+                Ranole. Esse domínio servirá apenas as páginas publicadas deste workspace — o
+                dashboard continua em <code className="rounded bg-surface px-1">ranole.com</code>.
               </p>
 
               <div className="mt-5 space-y-5">
                 <div className="rounded-lg border border-border bg-surface p-4">
                   <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                     <span className="rounded bg-primary/15 px-2 py-0.5 text-primary-glow">Passo 1</span>
-                    Apontar o domínio para a Lovable
+                    Apontar o domínio para o Ranole (CNAME proxiado)
                   </div>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <CopyField label="Tipo" value="A" />
+                    <CopyField label="Tipo" value="CNAME" />
                     <CopyField label="Nome" value={current.split(".").length > 2 ? current.split(".")[0] : "@"} />
-                    <CopyField label="Valor" value={TARGET_A_RECORD} />
+                    <CopyField label="Valor" value={PROXY_TARGET_HOST} />
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground">
-                    Dica: adicione também um registro <code className="rounded bg-surface-elevated px-1">A www</code> com o mesmo valor para que <code className="rounded bg-surface-elevated px-1">www.{current}</code> também resolva.
+                    No Cloudflare, mantenha o registro com a <strong>nuvem laranja (Proxied)</strong>
+                    ativada — é isso que emite o SSL no seu domínio. Em <em>SSL/TLS</em> use o modo
+                    <strong> Full</strong>. Em <em>Rules → Origin Rules</em>, crie uma regra que
+                    sobrescreva o <strong>Host Header</strong> para <code className="rounded bg-surface-elevated px-1">{current}</code>
+                    (ou deixe o padrão; o Ranole já resolve pelo Host original).
                   </p>
                 </div>
 
@@ -266,10 +272,14 @@ function DomainsPage() {
                 <div className="rounded-lg border border-border bg-surface p-4">
                   <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                     <span className="rounded bg-primary/15 px-2 py-0.5 text-primary-glow">Passo 3</span>
-                    Anexar o domínio no projeto (emissão de SSL)
+                    Definir a página inicial do domínio
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Depois que o DNS propagar, abra <strong>Configurações do projeto → Domínios</strong> na Lovable e clique em <em>Connect Domain</em> usando <code className="rounded bg-surface-elevated px-1">{current}</code>. Esse passo emite o certificado SSL automaticamente. Sem ele, o domínio não responde via HTTPS.
+                    No <Link to="/dashboard" className="underline">Dashboard</Link>, em uma página
+                    publicada, clique no ícone de <strong>casa</strong> para marcá-la como home.
+                    Ela será servida em <code className="rounded bg-surface-elevated px-1">https://{current}</code>.
+                    As demais páginas publicadas ficam disponíveis em
+                    <code className="rounded bg-surface-elevated px-1">https://{current}/&lt;slug&gt;</code>.
                   </p>
                 </div>
               </div>
@@ -277,7 +287,11 @@ function DomainsPage() {
               <div className="mt-5 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <p>
-                  Após configurar os DNS e anexar na Lovable, clique em <strong>Verificar DNS agora</strong>. Quando o status ficar <strong>Ativo</strong>, defina a página inicial do domínio no Dashboard (ícone de casa em uma página publicada).
+                  Depois de configurar o CNAME proxiado e o TXT, clique em <strong>Verificar DNS agora</strong>.
+                  A propagação geralmente leva poucos minutos.
+                </p>
+              </div>
+
                 </p>
               </div>
 
