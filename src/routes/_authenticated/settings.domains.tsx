@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/settings/domains")({
   notFoundComponent: () => <div className="p-6 text-sm">Não encontrado.</div>,
 });
 
-const TARGET_A_RECORD = "185.158.133.1";
+const PROXY_TARGET_HOST = "ranole.com";
 
 function StatusPill({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
