@@ -292,8 +292,7 @@ function DomainsPage() {
                 </p>
               </div>
 
-                </p>
-              </div>
+
 
               {status === "active" && (
                 <div className="mt-3 flex items-center gap-2 text-sm text-primary-glow">
